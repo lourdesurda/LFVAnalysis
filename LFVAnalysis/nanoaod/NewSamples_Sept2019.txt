@@ -1,0 +1,5 @@
+WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8/           	12.15488
+WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/			61526.7
+ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/     	35.85       	
+ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/  35.85	
+TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/    			85.172
