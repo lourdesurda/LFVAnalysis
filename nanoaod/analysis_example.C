@@ -19,7 +19,6 @@
 #include "CMSAnalysis.h"
 #include <vector>
 #include <TLorentzVector.h>
-
 #include <sys/stat.h>
 #include <iostream>
 #include <fstream>
@@ -34,7 +33,6 @@
 #include <TAxisEditor.h>
 #include <TAxis.h>
 #include <TGraphErrors.h>
-
 #include <TClonesArray.h>
 #include <TVectorF.h>
 #include <TTimeStamp.h>
@@ -52,7 +50,7 @@ struct TopAnalysis : public CMSAnalysis
 {
 	TopAnalysis()
 	{
-		init(); TFile("LFV_Analysis.root", "RECREATE").Close();
+		init(); //TFile("LFV_Analysis.root", "RECREATE").Close();
 	};
 	
 	virtual ~TopAnalysis(){};
@@ -190,127 +188,99 @@ struct HISTS : public CMSAnalysis
 {
 	static void Add(CMSAnalysis &cms)
 	{
-		cms.AddPlot1D("hMet", "Missing E_{T} [GeV]", 100, -10., 200.);
-  		cms.AddPlot1D("hMuon", "Muon pT [GeV]", 50, 25.0, 100.);
-  		cms.AddPlot1D("hElectron", "Electron pT [GeV]", 50, 10.0, 150.);
-  		cms.AddPlot1D("hJet", "Jet pT [GeV]", 50, 0.0, 250.);
-        	//cms.AddPlot1D("hMetJets30", "Missing E_{T} with 2 Jets of 30GeV [GeV]", 50, 0., 500.);
-
-  		cms.AddPlot1D("hMuonPhi", "Muon Phi", 100, -3.15, 3.15);
-  		cms.AddPlot1D("hMuonEta", "Muon Eta", 100, -3.0, 3.0);
-
- 		cms.AddPlot1D("hElectronPhi", "Electron Phi", 100, -3.15, 3.15);
-  		cms.AddPlot1D("hElectronEta", "Electron Eta", 100, -3.0, 3.0);
-
-  		cms.AddPlot1D("hJetEta", "Most energetic jet Eta", 100, -3.0, 3.0);
-		/*cms.AddPlot1D("hPVs","",50,0,50);         
-		cms.AddPlot1D("hPVs2","",50,0,50);
-
-		cms.AddPlot1D("hNJets","",10,0,10);         
-		cms.AddPlot1D("hNJets2","",10,0,10);*/
-
-		cms.AddPlot1D("hnVertex", "Number of Vertex", 100, 0, 100);
-  		cms.AddPlot1D("hnMuon", "Number of Muons", 6, 0, 6);
-  		cms.AddPlot1D("hnElectron", "Number of Electrons", 7, 0, 7);
-  		cms.AddPlot1D("hnJet", "Number of Jets", 25, 0, 25);	
-
-  		cms.AddPlot1D("hmetPhi", "MET Phi", 100, -3.15, 3.15);
-
-		cms.AddPlot1D("hMuonElectronPhi", "Muon-Electron Phi", 100, -3.15, 3.15);
-		cms.AddPlot1D("hMuonMetPhi", "Muon-MET Phi", 100, -3.15, 3.15);
-		cms.AddPlot1D("hElectronMetPhi", "Electron-Met Phi", 100, -3.15, 3.15);
-
-		cms.AddPlot1D("hInvariantMassMuonElectron", "Invariant Mass Muon-Electron [GeV]", 100, 0, 200);
-		cms.AddPlot1D("hTransverseMassMuonMET", "Transverse Mass Muon-MET [GeV]", 100, 0, 300);
-		cms.AddPlot1D("hTransverseMassElectronMET", "Transverse Mass Electron-MET [GeV]", 100, 0, 300);
-
-		cms.AddPlot1D("hnbLooseSel", "Number of BJets Loose", 5, -0.5, 4.5);
-		cms.AddPlot1D("hnbMediumSel", "Number BJets Medium", 5, -0.5, 4.5);
-		
-		cms.AddPlot1D("hdeltaR", "#DeltaR Muon-Electron", 13, -2.4, 10.0);
-		cms.AddPlot1D("hCollinearMass", "Collinear Mass Muon-Electron [GeV]", 100, 0, 350);
-		
-		cms.AddPlot1D("hnMuoSel", "Number of selected Muons", 10, 0, 10);
-		cms.AddPlot1D("hnEleSel", "Number of selected Electrons", 10, 0, 10);
-		cms.AddPlot1D("hnJetSel", "Number of selected jets", 11, -1, 10);
-
-		//cms.AddPlot1D("hCortes", "", 10, 0, 10);    
-        	/*cms.AddPlot1D("hJetPt", "Jet Pt [GeV]", 50, 0., 500.);         
-		cms.AddPlot1D("hJetEta", "Jet Eta", 50, -5., 5.);         
-		cms.AddPlot1D("hEleIDMVAFallV280","",2,0,2);         
-		cms.AddPlot1D("hEleIDMVAFallV190","",2,0,2);         
-		cms.AddPlot1D("hEleIso03","",100,0,1);         
-
-     
-		cms.AddPlot1D("hVisibleMassNoVeto", "Visible Mass (all) [GeV]", 300, 0., 300.);         
-		cms.AddPlot1D("hVisibleMassBTAGSel", "Visible Mass (Btag Sel) [GeV]", 300, 0., 300.);        
- 		cms.AddPlot1D("hVisibleMass", "Visible Mass (Btag Veto) [GeV]", 300, 0., 300.);         
-		cms.AddPlot1D("hVisibleMass0Jets", "Visible Mass 0Jets (BTag Veto) [GeV]", 300, 0., 300.);         
-		cms.AddPlot1D("hVisibleMass1Jets", "Visible Mass 1Jets (BTag Veto) [GeV]", 300, 0., 300.);         
-		cms.AddPlot1D("hVisibleMass2Jets", "Visible Mass 2Jets (BTag Veto) [GeV]", 300, 0., 300.);*/
+		cms.AddPlot1D("hMet", 				"Missing E_{T} [GeV]", 			 100, -10., 200.);
+  		cms.AddPlot1D("hMuon", 				"Muon pT [GeV]", 			50, 25.0, 100.);
+  		cms.AddPlot1D("hElectron", 			"Electron pT [GeV]", 			 50, 10.0, 150.);
+  		cms.AddPlot1D("hJet", 				"Jet pT [GeV]", 			 50, 0.0, 250.);
+  		cms.AddPlot1D("hMuonPhi", 			"Muon Phi", 				 100, -3.15, 3.15);
+  		cms.AddPlot1D("hMuonEta", 			"Muon Eta", 				 100, -3.0, 3.0);
+ 		cms.AddPlot1D("hElectronPhi", 			"Electron Phi", 			 100, -3.15, 3.15);
+  		cms.AddPlot1D("hElectronEta", 			"Electron Eta", 			 100, -3.0, 3.0);
+  		cms.AddPlot1D("hJetEta", 			"Most energetic jet Eta", 		 100, -3.0, 3.0);
+		cms.AddPlot1D("hnVertex", 			"Number of Vertex", 			 100, 0, 100);
+  		cms.AddPlot1D("hnMuon", 			"Number of Muons", 			 6, 0, 6);
+  		cms.AddPlot1D("hnElectron", 			"Number of Electrons", 			 7, 0, 7);
+  		cms.AddPlot1D("hnJet", 				"Number of Jets", 			 25, 0, 25);	
+  		cms.AddPlot1D("hmetPhi", 			"MET Phi", 				 100, -3.15, 3.15);
+		cms.AddPlot1D("hMuonElectronPhi", 		"Muon-Electron Phi", 			 100, -3.15, 3.15);
+		cms.AddPlot1D("hMuonMetPhi", 			"Muon-MET Phi", 			 100, -3.15, 3.15);
+		cms.AddPlot1D("hElectronMetPhi", 		"Electron-Met Phi", 			 100, -3.15, 3.15);
+		cms.AddPlot1D("hInvariantMassMuonElectron", 	"Invariant Mass Muon-Electron [GeV]", 	 100, 0, 200);
+		cms.AddPlot1D("hTransverseMassMuonMET", 	"Transverse Mass Muon-MET [GeV]", 	 100, 0, 300);
+		cms.AddPlot1D("hTransverseMassElectronMET", 	"Transverse Mass Electron-MET [GeV]", 	 100, 0, 300);
+		cms.AddPlot1D("hnbLooseSel", 			"Number of BJets Loose", 		 5, -0.5, 4.5);
+		cms.AddPlot1D("hnbMediumSel", 			"Number BJets Medium", 			 5, -0.5, 4.5);		
+		cms.AddPlot1D("hdeltaR", 			"#DeltaR Muon-Electron", 		 50, -2.4, 10.0);
+		cms.AddPlot1D("hCollinearMass", 		"Collinear Mass Muon-Electron [GeV]", 	 100, 0, 350);		
+		cms.AddPlot1D("hnMuoSel", 			"Number of selected Muons", 		 10, 0, 10);
+		cms.AddPlot1D("hnEleSel", 			"Number of selected Electrons", 	 10, 0, 10);
+		cms.AddPlot1D("hnJetSel", 			"Number of selected jets", 		 11, -1, 10);
 	}
-	static void Fill(TopAnalysis &cms, unsigned int iSample)
+	static void Fill(TopAnalysis &cms, const SAMPLES &sample, const double event_weight)
 	{
-		Float_b(MET_pt); 		cms.FillPlot1D("hMet", iSample, MET_pt);	    
-	    	VFloat_b(Electron_pt); 		cms.FillPlot1D("hElectron", iSample, Electron_pt[cms.Indexelsel]);	  
-            	VFloat_b(Muon_pt); 		cms.FillPlot1D("hMuon", iSample, Muon_pt[cms.Indexmusel]);
-            	VFloat_b(Jet_pt); 		cms.FillPlot1D("hJet", iSample, Jet_pt[0]);		
-   	
-	    	Int_b(PV_npvs);			cms.FillPlot1D("hnVertex", iSample, PV_npvs);
-    	    	Int_b(nMuon);			cms.FillPlot1D("hnMuon", iSample, nMuon);
-    	    	Int_b(nElectron); 		cms.FillPlot1D("hnElectron", iSample, nElectron);
-    	    	Int_b(nJet); 			cms.FillPlot1D("hnJet", iSample, nJet);//nJet
+		Float_b(MET_pt); 
+	    	VFloat_b(Electron_pt); 
+            	VFloat_b(Muon_pt); 	
+            	VFloat_b(Jet_pt);
+	    	Int_b(PV_npvs);
+    	    	Int_b(nMuon);	
+    	    	Int_b(nElectron);
+    	    	Int_b(nJet); 	
+           	Float_b(MET_phi);
+            	VFloat_b(Electron_phi);	
+            	VFloat_b(Muon_phi);	
+            	VFloat_b(Electron_eta);	
+            	VFloat_b(Muon_eta);
+	        VFloat_b(Jet_eta); 											 							 							
+		cms.FillPlot1D("hMet", sample , MET_pt);	    
+		cms.FillPlot1D("hElectron", sample, Electron_pt[cms.Indexelsel]);	  
+		cms.FillPlot1D("hMuon", sample, Muon_pt[cms.Indexmusel]);
+		cms.FillPlot1D("hJet", sample, Jet_pt[0]);		  	
+		cms.FillPlot1D("hnVertex", sample, PV_npvs);
+		cms.FillPlot1D("hnMuon", sample, nMuon);
+		cms.FillPlot1D("hnElectron", sample, nElectron);
+		cms.FillPlot1D("hnJet", sample, nJet);//nJet
+		cms.FillPlot1D("hmetPhi", sample, MET_phi);
+		cms.FillPlot1D("hElectronPhi", sample, Electron_phi[cms.Indexelsel]);
+		cms.FillPlot1D("hMuonPhi", sample, Muon_phi[cms.Indexmusel]);
+		cms.FillPlot1D("hElectronEta", sample, Electron_eta[cms.Indexelsel]);
+		cms.FillPlot1D("hMuonEta", sample, Muon_eta[cms.Indexmusel]);
+		cms.FillPlot1D("hJetEta", sample, Jet_eta[0]);		
+		cms.FillPlot1D("hMuonElectronPhi", sample, ANGLES::DeltaPhi(Muon_phi[cms.Indexmusel], Electron_phi[cms.Indexelsel]));
+		cms.FillPlot1D("hMuonMetPhi", sample, ANGLES::DeltaPhi(Muon_phi[cms.Indexmusel], MET_phi));
+		cms.FillPlot1D("hElectronMetPhi", sample, ANGLES::DeltaPhi(Electron_phi[cms.Indexelsel], MET_phi));
 
-           	Float_b(MET_phi);		cms.FillPlot1D("hmetPhi", iSample, MET_phi);
-            	VFloat_b(Electron_phi);		cms.FillPlot1D("hElectronPhi", iSample, Electron_phi[cms.Indexelsel]);
-            	VFloat_b(Muon_phi);		cms.FillPlot1D("hMuonPhi", iSample, Muon_phi[cms.Indexmusel]);
+		TLorentzVector LorentzElec;		
+		TLorentzVector LorentzMuon;	
+		TLorentzVector LorentzMET;
 
-            	VFloat_b(Electron_eta);		cms.FillPlot1D("hElectronEta", iSample, Electron_eta[cms.Indexelsel]);
-            	VFloat_b(Muon_eta);		cms.FillPlot1D("hMuonEta", iSample, Muon_eta[cms.Indexmusel]);
-	        VFloat_b(Jet_eta); 		cms.FillPlot1D("hJetEta", iSample, Jet_eta[0]);		
+		LorentzElec.SetPtEtaPhiM(Electron_pt[cms.Indexelsel],Electron_eta[cms.Indexelsel],Electron_phi[cms.Indexelsel], electronMass);
+		LorentzMuon.SetPtEtaPhiM(Muon_pt[cms.Indexmusel], Muon_eta[cms.Indexmusel], Muon_phi[cms.Indexmusel], muonMass);	
+		LorentzMET.SetPtEtaPhiM(MET_pt, 0.0, MET_phi, METMass);
 
-		cms.FillPlot1D("hMuonElectronPhi", iSample, ANGLES::DeltaPhi(Muon_phi[cms.Indexmusel], Electron_phi[cms.Indexelsel]));
-		cms.FillPlot1D("hMuonMetPhi", iSample, ANGLES::DeltaPhi(Muon_phi[cms.Indexmusel], MET_phi));
-		cms.FillPlot1D("hElectronMetPhi", iSample, ANGLES::DeltaPhi(Electron_phi[cms.Indexelsel], MET_phi));
+		cms.FillPlot1D("hInvariantMassMuonElectron", sample, FOURVECTORS::InvariantMass(LorentzMuon, LorentzElec));
+		cms.FillPlot1D("hTransverseMassMuonMET", sample, FOURVECTORS::TranverseMass(LorentzMuon, LorentzMET));
+		cms.FillPlot1D("hTransverseMassElectronMET", sample, FOURVECTORS::TranverseMass(LorentzElec, LorentzMET));
+		cms.FillPlot1D("hnbLooseSel", sample, cms.nbLooseSel);
+		cms.FillPlot1D("hnbMediumSel", sample, cms.nbMediumSel);
 
-		TLorentzVector LorentzElec;	LorentzElec.SetPtEtaPhiM((double)Electron_pt[cms.Indexelsel], (double) Electron_eta[cms.Indexelsel], (double) Electron_phi[cms.Indexelsel], electronMass);
-		TLorentzVector LorentzMuon;	LorentzMuon.SetPtEtaPhiM(Muon_pt[cms.Indexmusel], Muon_eta[cms.Indexmusel], Muon_phi[cms.Indexmusel], muonMass);
-		TLorentzVector LorentzMET;	LorentzMET.SetPtEtaPhiM(MET_pt, 0.0, MET_phi, METMass);
+		cms.FillPlot1D("hdeltaR", sample, ANGLES::DeltaR(Muon_phi[cms.Indexmusel], Electron_phi[cms.Indexelsel], Muon_eta[cms.Indexmusel], 			Electron_eta[cms.Indexelsel]));
 
-		cms.FillPlot1D("hInvariantMassMuonElectron", iSample, FOURVECTORS::InvariantMass(LorentzMuon, LorentzElec));
-		cms.FillPlot1D("hTransverseMassMuonMET", iSample, FOURVECTORS::TranverseMass(LorentzMuon, LorentzMET));
-		cms.FillPlot1D("hTransverseMassElectronMET", iSample, FOURVECTORS::TranverseMass(LorentzElec, LorentzMET));
+		cms.FillPlot1D("hCollinearMass", sample, FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec,
+		LorentzMET,ANGLES::DeltaPhi(Electron_phi[cms.Indexelsel], MET_phi)) );
 
-		cms.FillPlot1D("hnbLooseSel", iSample, cms.nbLooseSel);
-		cms.FillPlot1D("hnbMediumSel", iSample, cms.nbMediumSel);
-
-		//cms.FillPlot1D("hdeltaR", iSample, sqrt( (Muon_phi[cms.Indexmusel]-Electron_phi[cms.Indexelsel])*(Muon_phi[cms.Indexmusel]-Electron_phi[cms.Indexelsel]) 
-							//+ (Muon_eta[cms.Indexmusel]-Electron_eta[cms.Indexelsel])*(Muon_eta[cms.Indexmusel]-Electron_eta[cms.Indexelsel]) ) );
-		//cms.FillPlot1D("hdeltaR", iSample, sqrt( (DeltaPhi(Muon_phi[cms.Indexmusel], Electron_phi[cms.Indexelsel])*DeltaPhi(Muon_phi[cms.Indexmusel], Electron_phi[cms.Indexelsel]) 
-							//+ (Muon_eta[cms.Indexmusel]-Electron_eta[cms.Indexelsel])*(Muon_eta[cms.Indexmusel]-Electron_eta[cms.Indexelsel]) ) );
-
-		cms.FillPlot1D("hdeltaR", iSample, ANGLES::DeltaR(Muon_phi[cms.Indexmusel], Electron_phi[cms.Indexelsel], Muon_eta[cms.Indexmusel], Electron_eta[cms.Indexelsel]));
-
-		//cms.FillPlot1D("hCollinearMass", iSample, FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec, LorentzMET, MET_phi-Electron_phi[cms.Indexelsel]) );
-
-		cms.FillPlot1D("hCollinearMass", iSample, FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec, LorentzMET, ANGLES::DeltaPhi(Electron_phi[cms.Indexelsel], MET_phi)) );
-
-		cms.FillPlot1D("hnMuoSel", iSample, cms.nmusel);
-		cms.FillPlot1D("hnEleSel", iSample, cms.nelsel);
-		cms.FillPlot1D("hnJetSel", iSample, cms.njtsel);
-	
-		/*std::cout << " N JET sel when the loop is over " << cms.njtsel << " nJets iniciales "  << nJet << std::endl;
-		std::cout << " N ELE sel when the loop is over " << cms.nelsel << " nElectrons iniciales "  << nElectron << std::endl;
-		std::cout << " N MUO sel when the loop is over " << cms.nmusel << " nMuons iniciales "  << nMuon << std::endl;*/
+		cms.FillPlot1D("hnMuoSel", sample, cms.nmusel);
+		cms.FillPlot1D("hnEleSel", sample, cms.nelsel);
+		cms.FillPlot1D("hnJetSel", sample, cms.njtsel);
 	}
 
-	static void Save(TopAnalysis &cms, unsigned int iSample, ASCII &txtFiles)
+	static void Save(TopAnalysis &cms, const SAMPLES &sample, ASCII &txtFiles)
 	{
 		TString option = "RECREATE"; 
 
 		for(auto &name: txtFiles.HistogramsList)
 		{
-			cms.SavingHistograms(iSample, name, option);
+			cms.SavingHistograms(sample, name, option);
 			if(option =="RECREATE") option = "UPDATE";
 		}
 	}
@@ -331,63 +301,39 @@ struct HISTS : public CMSAnalysis
 int main(int argc, char** argv)
 {
   	// Directory where files are sitting
-	TString dir = "/eos/user/c/cepeda/LFVNANO/Skimmed2/"; //TString dir = "/eos/user/c/cepeda/LFVNANO/MUESKIM/"; 
+	TString dir = "/eos/user/c/cepeda/LFVNANO/Skimmed2/"; 
 	
 	// Initialize analysis structure
   	TopAnalysis cms; 
-	ANGLES angulos;
-  	// Add ****DATA**** sample. Input is: (titleId, file, luminosity) // One should add this sample first, to define the luminosity for normalizations
+
+  	int maxevents = -1; 	
+
+	//*****USING FUNCTION AddFiles ******
+
+	//void CMSAnalysis::AddFiles(TString tipo, TString name, double luminosity, double xsection, TString path, int ntrees, double maxevents, double numberofevents)
+
+	TString tipo = "Data";
+
+  cms.AddFiles(tipo, "DataA", 13.5*1000., -1, dir+"SingleMuRun2018A/", 177, -1, -1);
+  cms.AddFiles(tipo, "DataB", 6.8*1000., -1, dir+"SingleMuRun2018B/", 85, -1, -1);
+  cms.AddFiles(tipo, "DataC", 6.6*1000., -1, dir+"SingleMuRun2018C/", 71, -1, -1);
+  cms.AddFiles(tipo, "DataD", 32*1000., -1, dir+"SingleMuRun2018D/", 1, -1, -1);
+		
+	tipo = "MCSignal";
 	
-	double lumi_invpbA =13.5*1000.;        
-	cms.AddDataSampleFiles("DataA", dir+"SingleMuRun2018A/", "tree", lumi_invpbA, 177); 
+  cms.AddFiles(tipo, "GG", -1, 48.58*0.1, dir+"GluGlu_LFV_HToMuTau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/", 8, maxevents, 2000000);
+  cms.AddFiles(tipo, "VBF", -1, 3.782*0.1, dir+"VBF_LFV_HToMuTau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/", 26, maxevents, 1938500);
+	
+	tipo = "MCBckgr";
 
-	double lumi_invpbB =6.8*1000.;        
-	cms.AddDataSampleFiles("DataB", dir+"SingleMuRun2018B/", "tree", lumi_invpbB, 85); 
-       
-	double lumi_invpbC =6.6*1000.;        
-	cms.AddDataSampleFiles("DataC", dir+"SingleMuRun2018C/", "tree", lumi_invpbC, 71);
-        
-	double lumi_invpbD = 32.*1000.; //RUND
-  	cms.AddDataSampleFiles("DataD", dir+"SingleMuRun2018D/", "tree", lumi_invpbD, 1);
-
-  	int maxevents = -1;// Set maximum number of events in MC//int maxevents = 3000000; for fast tests but reasonabe MC statistics int maxevents = 500000; for very fast tests with MC int maxevents = 50000; for very fast tests with MC 	
-
-  	// Add ****SIGNAL**** sample. Input is: (titleId, file, maxevents, xsection in pb, total_events_for_xsection) 	
-
-	TString inputSignalFile = "GluGlu_LFV_HToMuTau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/";	
-	double xsec_signal = 48.58*0.1;
-
-	//cms.AddMCSignalSample("GG", inputSignalFile, maxevents, xsec_signal, 8000);
-	cms.AddMCSignalSampleFiles("GG (B = 10%)", inputSignalFile, "tree", maxevents, xsec_signal, 8000, 1);
-
-	TString inputSignalFile_VBF = "VBF_LFV_HToMuTau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/";	
-	double xsec_signal_VBF = 3.782*0.1;
-	//cms.AddMCSignalSample("VBF", inputSignalFile_VBF, maxevents, xsec_signal_VBF, 114800);
-	cms.AddMCSignalSampleFiles("VBF (B = 10%)", inputSignalFile_VBF, "tree", maxevents, xsec_signal_VBF, 114800, 1);
-
-	// Add ****MC SAMPLES****. Input is: (titleId, file, maxevents, xsection in pb)
-
-	ASCII txtFiles;
-
-	txtFiles.mapsfilling("NewSamples_Sept2019.txt");
-	TString legendname[5] = {"WW", "W+Jets", "TW", "#bar{T}W", "T#bar{T}"};
-	int ss = 0;
-	for(auto &s : txtFiles.Samples)
-	{
-		TString inputBkgdFile = s.first;
-		double xsec_bkgd = s.second; 
-		cms.AddMCSampleFiles(legendname[ss], dir+inputBkgdFile, "tree", maxevents, xsec_bkgd, cms.NumberOfEntries(dir+inputBkgdFile, 1), 1);
-		ss++;
-	}
-
-	double xsec_DY = 2075.14*3; // DY 13 TeV, Mll>50 GeV         
-    	TString inputBkgdFile = "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/";
-	cms.AddMCSampleFiles("DY", dir+inputBkgdFile, "tree", maxevents, xsec_DY, cms.NumberOfEntries(dir+inputBkgdFile, 129), 129);
-
-	//cms.AddMCSampleFiles("DY", dir+"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/", "tree", maxevents, xsec_DY, maxevents_forXsection_DY, 129);
-
-	//cms.AddMCSample("WZ_background_DAS", "WZ_background_DAS.root", maxevents, 27.6, 370000); //XSDB from DAS 
-	//cms.AddMCSample("ZZ_background_DAS", "ZZ_background_DAS.root", maxevents, 12.14, 637000);
+  cms.AddFiles(tipo,"WW", -1, 12.15488, dir+"WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8/", 1, maxevents, cms.NumberOfEntries(dir+"WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8/", 1));
+  cms.AddFiles(tipo,"WJets", -1, 61526.7, dir+"WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/", 1, maxevents, cms.NumberOfEntries(dir+"WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/", 1));
+  cms.AddFiles(tipo,"TW",-1,35.85,dir+"ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/",1,maxevents,cms.NumberOfEntries(dir+"ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/", 1));
+  cms.AddFiles(tipo,"TbarW",-1,35.85,dir+"ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/",1,-1,cms.NumberOfEntries(dir+"ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/", 1));
+  cms.AddFiles(tipo,"TTbar", -1, 85.172, dir+"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/", 1, maxevents, cms.NumberOfEntries(dir+"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/", 1));
+  cms.AddFiles(tipo,"DY",-1,2075.14*3,dir+"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/",129,maxevents,cms.NumberOfEntries(dir+"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/", 129));
+  cms.AddFiles(tipo,"WZ", -1, 27.6, dir+"WZ_TuneCP5_13TeV-pythia8/", 5, maxevents, cms.NumberOfEntries(dir+"WZ_TuneCP5_13TeV-pythia8/",5));
+  cms.AddFiles(tipo,"ZZ", -1, 12.14, dir+"ZZ_TuneCP5_13TeV-pythia8/", 3, maxevents, cms.NumberOfEntries(dir+"ZZ_TuneCP5_13TeV-pythia8/",3));  	
 
   	// Initialize 1D histograms
 
@@ -396,65 +342,138 @@ int main(int argc, char** argv)
   	// Loop on samples
   	unsigned int nsamples = cms.GetNumberOfSamples();
 
-	//txtFiles.txtCounter("NameOfHistograms.txt");
+	ASCII txtFiles;
+	txtFiles.txtCounter("NameOfHistograms.txt");
 
+	TString mydir = "/afs/cern.ch/work/l/lurda/CMS/May_2019/ExoticHiggsDecay/codigojuan/GitLab_NANOAOD/LFVAnalysis/nanoaod/";
+
+	//****PILE UP REWEIGHTING HISTOGRAM****
+	TH1D* Ratio = nullptr; 
+	Ratio = cms.ReadingFileAndGettingTH1Histogram(mydir+"python/pyroot/pileupweights.root", "RatioPU");
+
+	//****MUON TIGHT ID EFFICIENCY HISTOGRAM*****
+	TH2D* MuonTightIDEfficiencyHist = nullptr;
+	MuonTightIDEfficiencyHist = cms.ReadingFileAndGettingTH2Histogram(mydir+"MuonEff_corr/RunABCD_SF_ID.root", "NUM_TightID_DEN_TrackerMuons_pt_abseta");
+
+	//****MUON TIGHT ISO EFFICIENCY HISTOGRAM*****
+	TH2D* MuonTightISOEfficiencyHist = nullptr;
+	MuonTightISOEfficiencyHist = cms.ReadingFileAndGettingTH2Histogram(mydir+"MuonEff_corr/RunABCD_SF_ISO.root", "NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
+ 
+	//****ELECTRON ID SCALE FACTOR *****
+	TH2D* ElectroIDScaleFactorHistogram = nullptr;
+	ElectroIDScaleFactorHistogram = cms.ReadingFileAndGettingTH2Histogram(mydir+"ElecEff_corr/egammaEffi_passingMVA102Xwp90isoHWWiso0p06_2018runABCD.txt", "Muon_idSF2D");
+
+	//****TRIGGER HLT_IsoMu24 SCALE FACTOR****
+	TH2D* TriggerHLTIsoMu24ScaleFactorHistogram = nullptr;
+	TriggerHLTIsoMu24ScaleFactorHistogram = cms.ReadingFileAndGettingTH2Histogram(mydir+"python/pyroot/Trigger_HLT_IsoMu24_weights.root", "HLT_IsoMu24_SFHist");
+	
+	//for (auto &xsmp : cms._SampleInfo)
   	for (unsigned int iSample=0; iSample<nsamples; ++iSample) 
 	{
+		// std::cout<<"Procesando muestra " << xsmp.GetSampleId() << " " << xsmp.NumberOfFilesInSample <<std::endl;
 		std::cout<<"Procesando muestra " << iSample << " " << cms.GetSampleId(iSample) << " " <<cms.GetNumberOfFilesInSample(iSample)<<std::endl;
-
-            	for (unsigned int iFileInSample=1; iFileInSample<=cms.GetNumberOfFilesInSample(iSample); iFileInSample++)
+		
+		for(unsigned int iFileInSample=1; iFileInSample<=cms.GetNumberOfFilesInSample(iSample); iFileInSample++)
 		{
+			std::cout << " LINE 381: iFileInSample " << iFileInSample << std::endl;
+			
 			// Set tree                 
 			bool foundTree=true;                 
 	                      
 			if(!cms.SetTreeFile(iSample,iFileInSample)) foundTree=false;                 
-		
+			
+			std::cout << "NEW CHECK " << cms.GetSampleId(iSample) << std::endl;			
+			
 			if (!foundTree) continue;
       			
 			// Loop on events for the current sample
-      			unsigned int nevents = 4000000;//cms.GetNumberOfEvents(iSample);//coger entradas por tree
+      			long long nevents = cms._NANOTREE->GetEntriesFast();
 
+			if (nevents>1000) nevents=1000;
 
-      			for (unsigned int iEvent=0; iEvent<nevents; iEvent++)
+			std::cout<<" LINE 395:  Reading entries in this file: "<<nevents<<std::endl;
+
+      			for (long long iEvent=0; iEvent<nevents; iEvent++)
 			{
           	 		// Set next entry
-           	 		if (cms.SetEntry(iEvent)<0) break;
-
-           	 		// The event number has typeId "unsigned long long" because it can be a big number
-           	 		//auto eventnumber = cms.Get<unsigned long long>("event");
-           	 		//printf("Event number: %llu\n", eventnumber);
-
+           	 		if (cms.SetEntry(iEvent)<0) {std::cout << "WARNING: PROBLEMS READING NTUPLES" << std::endl; break;}
+ 
            	 		// Preselect (summary branch must be read before)
            	 		if (!cms.Preselect()) continue;
           
            	 		// Select (event branch must be read before)
            	 		if (!cms.Select()) continue;
 
-				/*double myweight = 1. ;
-				if(!cms.GetSampleId(iSample).Contains("Data") && !cms.GetSampleId(iSample).Contains("GG") && !cms.GetSampleId(iSample).Contains("VBF"))
+            			// Fill histograms
+				double pileup_weight = 1.;
+
+				double MuonTightIDEff_weight = 1.;
+				double MuonTightISOEff_weight = 1.;
+
+				double ElectronEff_weight = 1.0;
+ 
+				double Trigger_weight = 1.0;
+
+				if(!cms.GetSampleId(iSample).Contains("Data"))
 				{
-					Float_b(puWeight);
-					myweight= puWeight;
-				}*/
-            			// Fill histograms			
-				HISTS::Fill(cms, iSample);
-			
+					Float_b(Pileup_nTrueInt);
+					pileup_weight = cms.PileupReweighting(Ratio, Pileup_nTrueInt);
+
+					VFloat_b(Muon_pt);
+  					VFloat_b(Muon_eta);
+					std::cout << " MUON SELECTED " << cms.nmusel << " pt " << Muon_pt[cms.Indexmusel] << " eta " << fabs(Muon_eta[cms.Indexmusel]) << " PileupNtRUE " << Pileup_nTrueInt<< std::endl;
+					if(Muon_pt[cms.Indexmusel] > 120.) 
+					{
+						MuonTightIDEff_weight = cms.ScaleFactors(MuonTightIDEfficiencyHist, 119., fabs(Muon_eta[cms.Indexmusel]));
+						MuonTightISOEff_weight = cms.ScaleFactors(MuonTightISOEfficiencyHist, 119., fabs(Muon_eta[cms.Indexmusel]));
+					}
+
+					else 
+					{
+						MuonTightIDEff_weight = cms.ScaleFactors(MuonTightIDEfficiencyHist, Muon_pt[cms.Indexmusel], fabs(Muon_eta[cms.Indexmusel]));
+						MuonTightISOEff_weight = cms.ScaleFactors(MuonTightISOEfficiencyHist, Muon_pt[cms.Indexmusel], fabs(Muon_eta[cms.Indexmusel]));
+					}
+
+					//std::cout << " 			MUON TIGHT EFFICIENCY WEIGHT " << MuonTightIDEff_weight << std::endl;
+					//std::cout << " 				MUON ISO EFFICIENCY WEIGHT " << MuonTightISOEff_weight << std::endl;
+
+					VFloat_b(Electron_pt);
+					VFloat_b(Electron_eta);
+
+					std::cout << " ELECTRON SELECTED " << cms.nmusel << " pt " << Electron_pt[cms.Indexelsel] << " eta " << Electron_eta[cms.Indexelsel] <<std::endl;
+
+					ElectronEff_weight = cms.ScaleFactors(ElectroIDScaleFactorHistogram, Electron_eta[cms.Indexelsel], Electron_pt[cms.Indexelsel]);
+
+					Trigger_weight	= cms.ScaleFactors(TriggerHLTIsoMu24ScaleFactorHistogram, Muon_pt[cms.Indexmusel], fabs(Muon_eta[cms.Indexmusel));
+				}
+
+				double event_weight = pileup_weight * MuonTightIDEff_weight * MuonTightISOEff_weight * ElectronEff_weight * Trigger_weight;
+
+				std::cout << "PILEUP_WEIGHT " << pileup_weight << std::endl;
+				std::cout << "		MuonTightIDEff_weight " << MuonTightIDEff_weight << std::endl;
+				std::cout << "			MuonTightISOEff_weight " << MuonTightISOEff_weight << std::endl;
+				std::cout << "				ElectronEff_weight " << ElectronEff_weight << std::endl;
+				std::cout << "					Trigger_weight " << Trigger_weight << std::endl;
+				std::cout << " 						PESO CALCULADO HASTA EL MOMENTO " << event_weight << std::endl << std::endl;
+
+				HISTS::Fill(cms, cms._SampleInfo[iSample], event_weight);
+				
       			}			
 		}
 			
-		//HISTS::Save(cms, iSample, txtFiles);
+		HISTS::Save(cms, cms._SampleInfo[iSample], txtFiles);
 
-  	}  	//To see things interactively (commnent otherwise) 
+  	}  	
 
-	//cms.ScalePlots();
+	//To see things interactively (commnent otherwise) 
+
   	auto app = new TRint("Top Analysis", &argc, argv); 
 
-	txtFiles.txtCounter("NameOfHistograms.txt");
+	//txtFiles.txtCounter("NameOfHistograms.txt");
 
   	HISTS::Draw(cms, txtFiles);
 
   	// To see things interactively (commnent otherwise) 
-
   	if (!gROOT->IsBatch()) app->Run();
 
   	return 0;
@@ -465,13 +484,13 @@ bool TopAnalysis::Preselect()
 	// Cut on summary information to save processing time
   	UInt_b(nElectron);
   	UInt_b(nMuon);
-	Bool_b(HLT_IsoMu27);
+	//Bool_b(HLT_IsoMu27);
 	Bool_b(HLT_IsoMu24);
   	//printf("nmu: %d, nel: %d\n", nMuon, nElectron);
 
   	if (nMuon+nElectron<2) 	return false; // look for events with >= 2 leptons
-	if (!HLT_IsoMu27 && !HLT_IsoMu24) return false;
-
+	//if (!HLT_IsoMu27 && !HLT_IsoMu24) return false;
+	if(!HLT_IsoMu24)return false;
   	UInt_b(nJet);
 
   	//printf("njt: %d\n", nJet);

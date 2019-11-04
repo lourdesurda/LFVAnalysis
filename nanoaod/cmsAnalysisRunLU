@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ "$#" -gt "0" ]; then
+  fileC=$1
+  fileEXE=${fileC%.*}.exe
+  rm -f ${fileEXE}
+  shift
+else
+  echo "Usage: cmsAnalysisRunLU [your_analysis_file.C]"
+  exit
+fi
+
+ROOTLIBS="-L/usr/lib64 `$ROOTSYS/bin/root-config --glibs` -lMathCore -lMinuit"
+ROOTINCDIR=`$ROOTSYS/bin/root-config --incdir`
+
+g++ -std=gnu++0x -I${ROOTINCDIR} ${fileC} CMSAnalysisLU.C SamplesClassLU.C ${ROOTLIBS} -lX11 -o ${fileEXE}
+#g++ -std=c++1y -I${ROOTINCDIR} ${fileC} CMSAnalysisLU.C ${ROOTLIBS} -lX11 -o ${fileEXE}
+./${fileEXE} "$@"
+
+rm -f ${fileEXE}

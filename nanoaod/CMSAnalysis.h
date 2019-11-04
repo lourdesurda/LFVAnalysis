@@ -3,6 +3,7 @@
 #include "TTree.h"
 #include "TString.h"
 #include <iostream>
+#include "SamplesClassLU.h"
 
 /// Complete analysis class to do CMS analysis using CMSTree2016 root files.
 class CMSAnalysis {
@@ -11,26 +12,28 @@ class CMSAnalysis {
       virtual ~CMSAnalysis();
 	
       /// Initialize and add data sample to the analysis (always first sample to add)
-      void AddDataSample(const TString& id, const TString& file, double luminosity, int nfiles=1);
+      //void AddDataSample(const TString& id, const TString& file, double luminosity, int nfiles=1);
       void AddDataSampleFiles(const TString& id,  const TString& dir, const TString& file, double luminosity, int nfiles=1);
+      //void AddDataSampleFiles(const string& id,  const string& dir, const string& file, double luminosity, int nfiles=1);
       /// Initialize and add the MC signal sample
      //void AddMCSignalSample(const TString& id, const TString& file, int maxevents, double xsection, int total_events_for_xsection=-1);
-	void AddMCSignalSample(const TString& id, const TString& file, int maxevents, double xsection, int total_events_for_xsection);
+	//void AddMCSignalSample(const TString& id, const TString& file, int maxevents, double xsection, int total_events_for_xsection);
       /// Initialize and add another MC background sample. All samples with the same "id" are added to the same histogram components at the end (stacked)
-      void AddMCSample(const TString& id, const TString& file, int maxevents, double xsection, int total_events_for_xsection=-1);
+      //void AddMCSample(const TString& id, const TString& file, int maxevents, double xsection, int total_events_for_xsection=-1);
       void AddMCSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, int total_events_for_xsection=-1, int nfiles=1);
 	void AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, int total_events_for_xsection, int nfiles) ;
-      void ScalePlots();
-
+    //  void ScalePlots();
+	void AddFiles(TString tipo, TString name, double luminosity, double xsection, TString path, int ntrees, double maxevents, double numerofevents);
       /// Set tree to the sample with index i
       void SetTree(int i);
       bool SetTreeFile(int i, int fileJ); 
-
+	TH1D* ReadingFileAndGettingTH1Histogram(TString path, TString histname);
+	TH2D* ReadingFileAndGettingTH2Histogram(TString path, TString histname);
       /// Access and set the entry entryNumber from the current tree. It returns 0 if OK, and -1 if there is an error or we are beyond limits. Note that it does not read in the contents of the event branches. This behavior is useful if branches are going to be read individually later. To also read all active branches, use GetEntry(entryNumber) instead
       Int_t SetEntry(int entryNumber);
 
       /// Access, set and read in the entry entryNumber from the current tree. It returns 0 if OK, and -1 if there is an error or we are beyond limits.
-      Int_t GetEntry(int entryNumber);
+   //   Int_t GetEntry(int entryNumber);
 
       /// Get entry number of the tree currently in use
       Int_t GetCurrentEntryNumber(){return _NANOTREE->GetReadEntry();};
@@ -72,30 +75,31 @@ class CMSAnalysis {
       /// Book 1D Plot for data and all bkgd components. It follows TH1 conventions
       void AddPlot1D(const TString& name, const TString& title, int nbins, double xmin, double xmax);
       /// Book 1D Plot for just one component
-      void AddPlot1D_bare(const TString& name, const TString& title, int nbins, double xmin, double xmax);
+      //void AddPlot1D_bare(const TString& name, const TString& title, int nbins, double xmin, double xmax);
       /// Fill histogram for the 1D Plot. It follows TH1 conventions.
-      void FillPlot1D(const TString& name, int isample, double value, double weight=1.);
-
+      void FillPlot1D(const TString& name, const SAMPLES &sample, double value, double weight=1.);
+	double PileupReweighting(const TH1D* Ratio, const float Pileup_nTrueInt);
+	double ScaleFactors(const TH2D* SFHistogram, float lepton_variable1, float lepton_variable2);
 	///
-	void SavingHistograms(int isample, const TString& name, const TString& option);
+	void SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option);
       /// Fill histogram for the 1D Plot with only one component
-      void FillPlot1D_bare(const TString& name, double value, double weight=1.);
+      //void FillPlot1D_bare(const TString& name, double value, double weight=1.);
       /// Draw 1D plot with data and all bckg components. It follows TH1 conventions. It also produces .pdf, .png and .root versions of the histogram, with an optional suffix (to avoid overwriting other plots)
-      void DrawPlot1D(const TString& name, const TString& suffix="", const TString& dir="png");
+      void DrawPlot1D(const TString& name, const TString& suffix="", const TString& dir="pngcorrections");
 
       /// Draw 1D plot for only one component
-      void DrawPlot1D_bare(const TString& name, const TString& suffix="", const TString& dir="");
+      //void DrawPlot1D_bare(const TString& name, const TString& suffix="", const TString& dir="");
 	
       /// Normalization utility for histograms
-      void Normalize_Histogram(const TString& name);
+    //  void Normalize_Histogram(const TString& name);
       /// Normalization utility for histogram (one component)
-      void Normalize_Histogram_bare(const TString& name);
+    //  void Normalize_Histogram_bare(const TString& name);
       /// Divide bare histograms
-      void Divide_Histogram_bare(const TString& name1, const TString& name2);
+     // void Divide_Histogram_bare(const TString& name1, const TString& name2);
       /// Get an individual MC histogram
-      TH1D* GetMCHistogram(const TString& name);
+    //  TH1D* GetMCHistogram(const TString& name);
       /// Get an individual Data histogram
-      TH1D* GetDataHistogram(const TString& name);
+    //  TH1D* GetDataHistogram(const TString& name);
 	long long int NumberOfEntries(const TString& path, int nfiles);
       /// True if the current event is a real data event
       bool isDataEvent(){return (!isMCFile());};
@@ -340,12 +344,12 @@ class CMSAnalysis {
 
       };
 
-  private:
+ private:
       double _lumi; ///<
       std::vector<TString> _sampleFile; ///<
       std::vector<TString> _sampleId; ///<
       std::vector<int> _sampleNevents; ///<
-      std::vector<int> _sampleNeventsTree; ///<
+      //std::vector<int> _sampleNeventsTree; ///<
       std::vector<int> _nDump10; ///<
       std::vector<double> _sampleXsection; ///<
       std::vector<double> _sampleWeight; ///<
@@ -355,11 +359,13 @@ class CMSAnalysis {
       std::vector<int> _sampleNeventsSumFiles;
       double _totalLuminosity;
       int _currentIndex; ///<
-      TFile* _file; ///<
+    
+	TFile* _file; ///<
 
-      std::vector<TH1D*> hists_1D; ///<
+      	std::vector<TH1D*> hists_1D; ///<
 	
-
+public:
+	std::vector<SAMPLES> _SampleInfo;
 };
 
 #define Int_b(a) Int_t a; if (!CMSAnalysis::Set(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
