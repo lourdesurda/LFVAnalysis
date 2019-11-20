@@ -27,11 +27,14 @@ class CMSAnalysis {
       /// Set tree to the sample with index i
       void SetTree(int i);
       bool SetTreeFile(int i, int fileJ); 
+
 	TH1D* ReadingFileAndGettingTH1Histogram(TString path, TString histname);
+
 	TH2D* ReadingFileAndGettingTH2Histogram(TString path, TString histname);
       /// Access and set the entry entryNumber from the current tree. It returns 0 if OK, and -1 if there is an error or we are beyond limits. Note that it does not read in the contents of the event branches. This behavior is useful if branches are going to be read individually later. To also read all active branches, use GetEntry(entryNumber) instead
       Int_t SetEntry(int entryNumber);
-
+	double GettingSF_bTag(const TString& DeepCSV, const TString& WP , const TString& SysType, int Flavour, float pt);
+	double bTagEventWeight(int nBtaggedJets, float bjetpt_1, int bjetflavour_1, float bjetpt_2, int bjetflavour_2, const TString& WP,const TString& SysType, int nBTags, const TString& DeepCSV);
       /// Access, set and read in the entry entryNumber from the current tree. It returns 0 if OK, and -1 if there is an error or we are beyond limits.
    //   Int_t GetEntry(int entryNumber);
 
@@ -85,7 +88,7 @@ class CMSAnalysis {
       /// Fill histogram for the 1D Plot with only one component
       //void FillPlot1D_bare(const TString& name, double value, double weight=1.);
       /// Draw 1D plot with data and all bckg components. It follows TH1 conventions. It also produces .pdf, .png and .root versions of the histogram, with an optional suffix (to avoid overwriting other plots)
-      void DrawPlot1D(const TString& name, const TString& suffix="", const TString& dir="pngcorrections");
+      void DrawPlot1D(const TString& name, const TString& suffix="", const TString& dir="png_00_generatorweight");
 
       /// Draw 1D plot for only one component
       //void DrawPlot1D_bare(const TString& name, const TString& suffix="", const TString& dir="");

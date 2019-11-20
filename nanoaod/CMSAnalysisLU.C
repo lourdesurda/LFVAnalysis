@@ -48,7 +48,12 @@ long long int CMSAnalysis::NumberOfEntries(const TString& path, int nfiles)
 	for(int itree=1; itree<=nfiles; itree++)
 	{
 		TFile *file =TFile::Open(path+Form("tree_%i.root", itree));
-		if(file==nullptr) { continue;}
+		if(file==nullptr) 
+		{ 
+			file =TFile::Open(path+Form("skimmed-nano_%i.root", itree));
+			if(file == nullptr) 
+			continue;
+		}
 		TH1F* h = (TH1F*)file->Get("eventcount_Skim");
 		suma =  suma + h->GetBinContent(1);
 		file->Close();
@@ -194,6 +199,94 @@ void CMSAnalysis::AddPlot1D(const TString& name, const TString& title, int nbins
             	hists_1D[hists_1D.size()-1]->Sumw2();
       }
 }
+double CMSAnalysis::GettingSF_bTag(const TString& DeepCSV, const TString& WP , const TString& SysType, int Flavour, float pt)
+{
+	///DeepCSV== loose, medium or tight; WP = comb, mujets, inclu; SysType = central, up, down; Flavour = Jet_hadronFlavour; pt = Jet_pt
+
+	if(DeepCSV=="medium")
+	{
+		if(WP=="comb")
+		{
+			if(fabs(Flavour) == 4 || fabs(Flavour) == 5) //# b o c
+			{
+				if(SysType == "central")
+					return 0.909339+(0.00354*(log(pt+19)*(log(pt+18)*(3-(0.471623*log(pt+18))))));
+			}
+			else
+				if(SysType == "central") 
+				{
+					std::cout << 1.6329-0.00160255*pt+1.9899e-06*pt*pt-6.72613e-10*pt*pt*pt << std::endl;
+					return 1.6329-0.00160255*pt+1.9899e-06*pt*pt-6.72613e-10*pt*pt*pt;
+				}
+		}
+		else 
+			return 0;
+	}
+	else
+		return 0;
+}
+
+double CMSAnalysis::bTagEventWeight(int nBtaggedJets, float bjetpt_1, int bjetflavour_1, float bjetpt_2, int bjetflavour_2, const TString& WP, const TString& SysType, int nBTags, const TString& DeepCSV)
+{
+	///'''Routine to calculate the event weight associated to btagging correction'''
+
+	if (nBtaggedJets > 2) {std::cout << "WARNING: nBtaggedJets > 2" << std::endl; return 0;}
+	if ( nBTags > 2 ) {std::cout << "WARNING: nBTags > 2" << std::endl; return 0;}
+ 
+ //   ##################################################################
+ //#   Event weight matrix:
+ //#   ------------------------------------------------------------------
+ //#   nBTags\b-tagged jets  |    0        1             2 lo q vemos btagged 
+ //#   ------------------------------------------------------------------
+ //#     0                   |    1      1-SF      (1-SF1)(1-SF2)
+ //#                         |
+ //#     1                   |    0       SF    SF1(1-SF2)+(1-SF1)SF2
+ //#                         |
+ //#     2                   |    0        0           SF1SF2
+//lo que queremos 
+ //   ##################################################################
+
+    	if ( nBTags > nBtaggedJets) {std::cout << " METHOD 1 " << std::endl; return 0;}
+  	if ( nBTags==0 && nBtaggedJets==0) {std::cout << " METHOD 2 "  << std::endl; return 1;}
+
+
+	double weight =0;
+    	if (nBtaggedJets==1)
+	{    	
+
+		//std::cout << " METHOD 3 " << std::endl;
+        	double SF = GettingSF_bTag(DeepCSV, WP, SysType, bjetflavour_1, bjetpt_1);
+		//std::cout << SF << std::endl;
+        	for (unsigned int i=0; i<2; i++)
+		{
+            		if ( i != nBTags ) continue;
+            		weight += pow(SF, i)*pow(1-SF, 1-i);
+			//std::cout << " SUMANDO WEIGHTS " << i << " weight = " << weight << std::endl;
+		}
+	}
+    
+    	else if (nBtaggedJets==2)
+	{
+
+		std::cout << " METHOD 4 " << std::endl;
+       		double SF1 = GettingSF_bTag(DeepCSV, WP, SysType, bjetflavour_1, bjetpt_1);
+        	double SF2 = GettingSF_bTag(DeepCSV, WP, SysType, bjetflavour_2, bjetpt_2);
+    	
+        	for (unsigned int i=0; i<2; i++)
+		{
+        		for (unsigned int j=0; j<2; j++)
+			{
+                		if( (i+j) != nBTags ) continue;
+                		weight += pow(SF1, i)*pow(1-SF1, 1-i)*pow(SF2, j)*pow(1-SF2, 1-j);
+			}
+		}
+	}
+
+	//if (weight < 1.) std::cout << " End of routine of btagging and the weight is <1 " << std::endl;
+	
+    	return  weight;
+
+}
 
 void CMSAnalysis::FillPlot1D(const TString& name, const SAMPLES &sample, double value, double weight) //PileUp
 {
@@ -239,7 +332,7 @@ TH2D* CMSAnalysis::ReadingFileAndGettingTH2Histogram(TString path, TString histn
 
 double CMSAnalysis::ScaleFactors(const TH2D* SFHistogram, float lepton_variable1, float lepton_variable2)
 {
-	std::cout << "*****Muon Efficiency routine starts" << std::endl;
+	//std::cout << "*****Muon Efficiency routine starts" << std::endl;
 
 	double bin_variable1 = SFHistogram->GetXaxis()->FindBin(lepton_variable1);
 	//std::cout << "		bin_pt " << bin_pt << " MUON PT " << lepton_pt << " FINDBIN PT " << MuonEfficiencyHistogram->GetXaxis()->FindBin(lepton_pt) <<std::endl;
@@ -254,36 +347,18 @@ double CMSAnalysis::ScaleFactors(const TH2D* SFHistogram, float lepton_variable1
 
 double CMSAnalysis::PileupReweighting(const TH1D* Ratio, const float Pileup_nTrueInt)
 {
-	std::cout << "Pileup Reweighting routine" << std::endl;
+//	std::cout << "Pileup Reweighting routine" << std::endl;
 	double event_weight = Ratio->GetBinContent(Pileup_nTrueInt);
-	return event_weight;
+	if (event_weight > 5000.) return 1;
+	else return event_weight;
 }
 
-/*double CMSAnalysis::IDEfficiency(TString cut, double lepton_pt, double lepton_eta)
-{
-	TFile *f = TFile::Open("/afs/cern.ch/work/l/lurda/CMS/May_2019/ExoticHiggsDecay/codigojuan/GitLab_NANOAOD/LFVAnalysis/nanoaod/MuonEff_corr/RunABCD_SF_ID.root");
-	TH2D* hEff = (TH2D*)f->Get(Form("NUM_%sID_DEN_TrackerMuons_pt_abseta",cut));
-	double idefficiency = hEff->GetBinContent(lepton_pt, lepton_eta);	
-	f->Close();	
-	return idefficiency;
-
-}
-
-double CMSAnalysis::RelIsoEfficiency(double isocut, double lepton_pt, double lepton_eta)
-{
-	TFile *f = TFile::Open("/afs/cern.ch/work/l/lurda/CMS/May_2019/ExoticHiggsDecay/codigojuan/GitLab_NANOAOD/LFVAnalysis/nanoaod/MuonEff_corr/RunABCD_SF_ISO.root");
-	if(isocut < 0.16) TH2D* hEff = (TH2D*)f->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
-	double relisoefficiency = hEff->GetBinContent(lepton_pt, lepton_eta);
-	f->Close();
-	return relisoefficiency;
-}*/
 
 void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option) 
 {
 	std::cout << sample.SampleId << " OPTION " << option << std::endl;
 
-	TFile *f = TFile::Open(sample.SampleId+"_ToPlot_ScaleFactors.root", option);
-
+	TFile *f = TFile::Open(sample.SampleId+"_ToPlot_00_generatorweight.root", option);
 	for (unsigned int j=0; j<hists_1D.size(); ++j) 
 	{
         	if (hists_1D[j]->GetName()==sample.SampleId+"_"+name) 
@@ -479,7 +554,7 @@ void CMSAnalysis::DrawPlot1D(const TString& name, const TString& suffix, const T
       	// Get data; stack all MC except signal MC
       	unsigned int nhists = hists_1D.size();
 
-	int colors[13] = {kBlue+1,  kYellow+1, kPink+1, kGreen+1, kOrange+1, kAzure+1, kMagenta+1, kCyan+1, kSpring+1, kTeal+1,   kViolet+1, kGray, kRed+1};
+	int colors[13] = {kBlue+1,  kYellow+1, kPink+1, kGreen+1, kOrange+1, kAzure+1, kMagenta+1, kCyan+1, kSpring+1,  kViolet+1, kTeal+1 , kGray, kRed+1};
 	//int colors[10] = {kRed-9, kMagenta-9, kBlue-9, kPink-9, kViolet-9, kAzure-9, kGreen-9, kCyan-9, KSpring-9, kTeal-9], 
 	
       	int mcindex = -1;
@@ -622,8 +697,8 @@ void CMSAnalysis::DrawPlot1D(const TString& name, const TString& suffix, const T
 	pad1->SetBottomMargin(0.1);
 	pad1->SetLeftMargin(0.2);
       	//hData->SetTitle("");
-      	hData->GetYaxis()->SetTitleOffset(1.8);
-      	hData->GetXaxis()->SetTitleOffset(1.8);
+      	hData->GetYaxis()->SetTitleOffset(2.2);
+      	hData->GetXaxis()->SetTitleOffset(2.2);
 	hData->GetYaxis()->SetTitle("Events");
 	hData->SetLabelSize(0.05, "XYZ");
 	
@@ -663,7 +738,7 @@ void CMSAnalysis::DrawPlot1D(const TString& name, const TString& suffix, const T
 	
 	pad2->cd();
       	setTDRStyle();
-	pad2->SetTopMargin(0.04);
+	pad2->SetTopMargin(0.02);
 	pad2->SetLeftMargin(0.2);
 	pad2->SetBottomMargin(0.3);
 	//gStyle->SetOptStat(0);
@@ -677,7 +752,7 @@ void CMSAnalysis::DrawPlot1D(const TString& name, const TString& suffix, const T
 	RatioDataMC->SetMinimum(0);
 	RatioDataMC->SetMarkerSize(0.8);
 	RatioDataMC->GetYaxis()->SetTitle("Data/MC");
-      	RatioDataMC->GetYaxis()->SetTitleOffset(0.45);
+      	RatioDataMC->GetYaxis()->SetTitleOffset(0.5);
 	RatioDataMC->SetLabelSize(0.08, "xy");
 	RatioDataMC->SetTitleSize(0.08, "xy");
 	//RatioDataMC->SetTitleSize(0.08, "y");
@@ -708,7 +783,7 @@ void CMSAnalysis::DrawPlot1D(const TString& name, const TString& suffix, const T
 	else 
 	{
             	c1->SaveAs(myDir+"/"+name+".png");
-		c1->SaveAs(myDir+"/"+name+".C");
+
 
       	}
 	std::cout << "TEST 3" << std::endl;
