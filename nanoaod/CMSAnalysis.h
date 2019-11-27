@@ -20,8 +20,8 @@ class CMSAnalysis {
 	//void AddMCSignalSample(const TString& id, const TString& file, int maxevents, double xsection, int total_events_for_xsection);
       /// Initialize and add another MC background sample. All samples with the same "id" are added to the same histogram components at the end (stacked)
       //void AddMCSample(const TString& id, const TString& file, int maxevents, double xsection, int total_events_for_xsection=-1);
-      void AddMCSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, int total_events_for_xsection=-1, int nfiles=1);
-	void AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, int total_events_for_xsection, int nfiles) ;
+      void AddMCSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, double total_events_for_xsection=-1, int nfiles=1);
+	void AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, double total_events_for_xsection, int nfiles) ;
     //  void ScalePlots();
 	void AddFiles(TString tipo, TString name, double luminosity, double xsection, TString path, int ntrees, double maxevents, double numerofevents);
       /// Set tree to the sample with index i
@@ -88,7 +88,7 @@ class CMSAnalysis {
       /// Fill histogram for the 1D Plot with only one component
       //void FillPlot1D_bare(const TString& name, double value, double weight=1.);
       /// Draw 1D plot with data and all bckg components. It follows TH1 conventions. It also produces .pdf, .png and .root versions of the histogram, with an optional suffix (to avoid overwriting other plots)
-      void DrawPlot1D(const TString& name, const TString& suffix="", const TString& dir="png_00_generatorweight");
+      void DrawPlot1D(const TString& name, const TString& suffix="", const TString& dir="png_V6");
 
       /// Draw 1D plot for only one component
       //void DrawPlot1D_bare(const TString& name, const TString& suffix="", const TString& dir="");

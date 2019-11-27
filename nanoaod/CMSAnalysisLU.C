@@ -47,14 +47,14 @@ long long int CMSAnalysis::NumberOfEntries(const TString& path, int nfiles)
 	long long int suma = 0;
 	for(int itree=1; itree<=nfiles; itree++)
 	{
-		TFile *file =TFile::Open(path+Form("tree_%i.root", itree));
+		TFile *file =TFile::Open(path+Form("skimmed-nano_%i.root", itree));
 		if(file==nullptr) 
-		{ 
-			file =TFile::Open(path+Form("skimmed-nano_%i.root", itree));
-			if(file == nullptr) 
+		//{ 
+			//file =TFile::Open(path+Form("skimmed-nano_%i.root", itree));
+			//if(file == nullptr) 
 			continue;
-		}
-		TH1F* h = (TH1F*)file->Get("eventcount_Skim");
+		//}
+		TH1F* h = (TH1F*)file->Get("eventcount");
 		suma =  suma + h->GetBinContent(1);
 		file->Close();
 	}
@@ -100,7 +100,7 @@ void CMSAnalysis::AddDataSampleFiles(const TString& id,  const TString& dir, con
 	printf("		DATA> %s - %s: luminosity: %f /pb (%f /pb), events %d\n", id.Data(), _sampleFile.back().Data(), luminosity, SAMPLES::TotalAnalysisLumi ,_sampleNevents.back());
 
 }
-void CMSAnalysis::AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, int total_events_for_xsection, int nfiles) 
+void CMSAnalysis::AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, double total_events_for_xsection, int nfiles) 
 {
   	std::cout << "AddMCSignalSampleFiles starts " << id << std::endl << std::endl;
 
@@ -118,7 +118,7 @@ void CMSAnalysis::AddMCSignalSampleFiles(const TString& id, const TString& dir, 
 	_SampleInfo[_SampleInfo.size()-1].SampleFlag = "isMCSignal";  // set signal flag to true
       	//_sampleNFiles.push_back(0);
 }
-void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, int total_events_for_xsection, int nfiles) 
+void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, double total_events_for_xsection, int nfiles) 
 {
 	//std::cout << "**ADDMCSAMPLEFILES Routine***" << std::endl;
         if (_dataIndex<0) {
@@ -170,9 +170,9 @@ void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const 
 
 void CMSAnalysis::AddFiles(TString tipo, TString name, double luminosity, double xsection, TString path, int ntrees, double maxevents, double numberofevents)
 {
-	if (tipo== "Data") 	AddDataSampleFiles(name, path, "tree", luminosity, ntrees);
-	if (tipo== "MCSignal") 	AddMCSignalSampleFiles(name, path, "tree", maxevents, xsection, numberofevents, ntrees);
-	if (tipo== "MCBckgr")	{std::cout << "	***MCBckgd routine*** " << std::endl; AddMCSampleFiles(name, path, "tree", maxevents, xsection, NumberOfEntries(path, ntrees), ntrees);}
+	if (tipo== "Data") 	AddDataSampleFiles(name, path, "skimmed-nano", luminosity, ntrees);
+	if (tipo== "MCSignal") 	AddMCSignalSampleFiles(name, path, "skimmed-nano", maxevents, xsection, numberofevents, ntrees);
+	if (tipo== "MCBckgr")	{std::cout << "	***MCBckgd routine*** " << std::endl; AddMCSampleFiles(name, path, "skimmed-nano", maxevents, xsection, NumberOfEntries(path, ntrees), ntrees);}
 }
 
 void CMSAnalysis::AddPlot1D(const TString& name, const TString& title, int nbins, double xmin, double xmax) 
@@ -215,7 +215,7 @@ double CMSAnalysis::GettingSF_bTag(const TString& DeepCSV, const TString& WP , c
 			else
 				if(SysType == "central") 
 				{
-					std::cout << 1.6329-0.00160255*pt+1.9899e-06*pt*pt-6.72613e-10*pt*pt*pt << std::endl;
+					//std::cout << 1.6329-0.00160255*pt+1.9899e-06*pt*pt-6.72613e-10*pt*pt*pt << std::endl;
 					return 1.6329-0.00160255*pt+1.9899e-06*pt*pt-6.72613e-10*pt*pt*pt;
 				}
 		}
@@ -246,8 +246,12 @@ double CMSAnalysis::bTagEventWeight(int nBtaggedJets, float bjetpt_1, int bjetfl
 //lo que queremos 
  //   ##################################################################
 
-    	if ( nBTags > nBtaggedJets) {std::cout << " METHOD 1 " << std::endl; return 0;}
-  	if ( nBTags==0 && nBtaggedJets==0) {std::cout << " METHOD 2 "  << std::endl; return 1;}
+    	if ( nBTags > nBtaggedJets){
+		//std::cout << " METHOD 1 " << std::endl; 
+		return 0;}
+  	if ( nBTags==0 && nBtaggedJets==0) {
+		//std::cout << " METHOD 2 "  << std::endl;
+		 return 1;}
 
 
 	double weight =0;
@@ -268,7 +272,7 @@ double CMSAnalysis::bTagEventWeight(int nBtaggedJets, float bjetpt_1, int bjetfl
     	else if (nBtaggedJets==2)
 	{
 
-		std::cout << " METHOD 4 " << std::endl;
+		//std::cout << " METHOD 4 " << std::endl;
        		double SF1 = GettingSF_bTag(DeepCSV, WP, SysType, bjetflavour_1, bjetpt_1);
         	double SF2 = GettingSF_bTag(DeepCSV, WP, SysType, bjetflavour_2, bjetpt_2);
     	
@@ -358,7 +362,7 @@ void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, c
 {
 	std::cout << sample.SampleId << " OPTION " << option << std::endl;
 
-	TFile *f = TFile::Open(sample.SampleId+"_ToPlot_00_generatorweight.root", option);
+	TFile *f = TFile::Open(sample.SampleId+"_ToPlot_V6.root", option);
 	for (unsigned int j=0; j<hists_1D.size(); ++j) 
 	{
         	if (hists_1D[j]->GetName()==sample.SampleId+"_"+name) 
