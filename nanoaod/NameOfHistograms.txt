@@ -15,6 +15,7 @@ hJetEta
 hMuonElectronPhi
 hMuonMetPhi
 hElectronMetPhi
+hbtagDeepB
 hInvariantMassMuonElectron
 hTransverseMassMuonMET
 hTransverseMassElectronMET
@@ -25,3 +26,4 @@ hCollinearMass
 hnMuoSel
 hnEleSel
 hnJetSel
+

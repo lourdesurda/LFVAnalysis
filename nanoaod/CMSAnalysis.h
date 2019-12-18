@@ -5,6 +5,7 @@
 #include <iostream>
 #include "SamplesClassLU.h"
 
+
 /// Complete analysis class to do CMS analysis using CMSTree2016 root files.
 class CMSAnalysis {
   public:
@@ -20,8 +21,8 @@ class CMSAnalysis {
 	//void AddMCSignalSample(const TString& id, const TString& file, int maxevents, double xsection, int total_events_for_xsection);
       /// Initialize and add another MC background sample. All samples with the same "id" are added to the same histogram components at the end (stacked)
       //void AddMCSample(const TString& id, const TString& file, int maxevents, double xsection, int total_events_for_xsection=-1);
-      void AddMCSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, double total_events_for_xsection=-1, int nfiles=1);
-	void AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, double total_events_for_xsection, int nfiles) ;
+      void AddMCSampleFiles(const TString& id, const TString& dir, const TString& file, double maxevents, double xsec, double total_events_for_xsection=-1, int nfiles=1);
+	void AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, double maxevents, double xsec, double total_events_for_xsection, int nfiles) ;
     //  void ScalePlots();
 	void AddFiles(TString tipo, TString name, double luminosity, double xsection, TString path, int ntrees, double maxevents, double numerofevents);
       /// Set tree to the sample with index i
@@ -84,11 +85,13 @@ class CMSAnalysis {
 	double PileupReweighting(const TH1D* Ratio, const float Pileup_nTrueInt);
 	double ScaleFactors(const TH2D* SFHistogram, float lepton_variable1, float lepton_variable2);
 	///
-	void SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option);
+	double QCDEstimation(TString& file, int jets, double dR, double Electron_pt, double Muon_pt);
+	void SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option, const string& charge, const string& muon, const string& jets, const string& bjets);
       /// Fill histogram for the 1D Plot with only one component
       //void FillPlot1D_bare(const TString& name, double value, double weight=1.);
       /// Draw 1D plot with data and all bckg components. It follows TH1 conventions. It also produces .pdf, .png and .root versions of the histogram, with an optional suffix (to avoid overwriting other plots)
-      void DrawPlot1D(const TString& name, const TString& suffix="", const TString& dir="png_V6");
+     // void DrawPlot1D(const TString& name, const TString& suffix="", const TString& dir="png_V6_2jets2bjets_OS_IsolatedMuon");
+	void DrawPlot1D(const TString& name, const TString& suffix, const TString& dir);
 
       /// Draw 1D plot for only one component
       //void DrawPlot1D_bare(const TString& name, const TString& suffix="", const TString& dir="");
@@ -351,7 +354,7 @@ class CMSAnalysis {
       double _lumi; ///<
       std::vector<TString> _sampleFile; ///<
       std::vector<TString> _sampleId; ///<
-      std::vector<int> _sampleNevents; ///<
+      std::vector<double> _sampleNevents; ///<
       //std::vector<int> _sampleNeventsTree; ///<
       std::vector<int> _nDump10; ///<
       std::vector<double> _sampleXsection; ///<
@@ -359,7 +362,7 @@ class CMSAnalysis {
       std::vector<bool> _signalFlag; ///<
       std::vector<int> _sampleNFiles; ///<
       int _dataIndex; ///<
-      std::vector<int> _sampleNeventsSumFiles;
+      std::vector<double> _sampleNeventsSumFiles;
       double _totalLuminosity;
       int _currentIndex; ///<
     

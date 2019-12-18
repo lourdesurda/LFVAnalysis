@@ -1,12 +1,20 @@
 //I am going to define a class for the Samples for my analisis. 
 //I am going to consider SAMPLES class. There may be many samples with different names and characteristics but all of them will share some common properties like all of the ID, number of events, xsection, number of files, etc. 
 //& means it's a reference to a pointer. I allow the function to change the variable
+
 #include "TFile.h"
 #include "TH1D.h"
 #include "TROOT.h"
 #include "TTree.h"
 #include "TString.h"
 #include <iostream>
+#include <sys/stat.h>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <stdio.h>
+#include <iomanip>
+
 using namespace std;
 
 struct SAMPLES
@@ -26,6 +34,7 @@ struct SAMPLES
 	// Constructor
 	explicit SAMPLES (const TString& id,  const TString& dir, const TString& file, int nfiles, double xsec, double luminosity, const TString Flag, long long TotalNumberOfEvents);
 	//OTRO CONSTRUCTOR PARA LOS FICHEROS
+	
 	// Destructor
 	~SAMPLES () {}	
 
@@ -42,6 +51,15 @@ struct SAMPLES
 	void Definitions(const TString& id,  const TString& dir, const TString& file, int nfiles, double xsec, double luminosity, const TString& Flag, long long TotalNumberOfEvents);
 
 	const TString &GetSampleId () {return SampleId;}
+	const int &GetNumberOfFilesInSample(){return SampleNFiles;}
+};
+struct FICH
+{
+	explicit FICH(const char* name, const TString& SampleID, const TString& WhatIsIt, const TString& Path, double xsec, double luminosity, const int Skimmed_nano_trees, long  NumberOfEvents, double TotalEventWeight);
+
+	~FICH() {}
+
+	void Readingtxtfiles(const char* name);
 };
 
 

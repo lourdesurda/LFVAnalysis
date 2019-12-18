@@ -20,11 +20,14 @@
 #include "TLine.h"
 #include "tdrstyle.C"
 #include "CMSAnalysis.h"
+#include "TString.h"
+//#include "RooWorkspace.h"
 
 TTree* CMSAnalysis::_NANOTREE = NULL;
 std::vector<TBranch*> CMSAnalysis::_BUFFERBRANCHES = {NULL};
 std::vector<Char_t> CMSAnalysis::_BUFFER = {0};
 
+//using namespace RooFit;
 
 CMSAnalysis::CMSAnalysis() 
 {
@@ -42,7 +45,7 @@ CMSAnalysis::~CMSAnalysis()
 };
 
 
-long long int CMSAnalysis::NumberOfEntries(const TString& path, int nfiles)
+/*long long int CMSAnalysis::NumberOfEntries(const TString& path, int nfiles)
 {
 	long long int suma = 0;
 	for(int itree=1; itree<=nfiles; itree++)
@@ -55,11 +58,11 @@ long long int CMSAnalysis::NumberOfEntries(const TString& path, int nfiles)
 			continue;
 		//}
 		TH1F* h = (TH1F*)file->Get("eventcount");
-		suma =  suma + h->GetBinContent(1);
+		suma =  suma + h->GetBinContent(2);
 		file->Close();
 	}
 	return suma;
-}
+}*/
 
 void CMSAnalysis::AddDataSampleFiles(const TString& id,  const TString& dir, const TString& file, double luminosity, int nfiles) 
 {
@@ -100,7 +103,7 @@ void CMSAnalysis::AddDataSampleFiles(const TString& id,  const TString& dir, con
 	printf("		DATA> %s - %s: luminosity: %f /pb (%f /pb), events %d\n", id.Data(), _sampleFile.back().Data(), luminosity, SAMPLES::TotalAnalysisLumi ,_sampleNevents.back());
 
 }
-void CMSAnalysis::AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, double total_events_for_xsection, int nfiles) 
+void CMSAnalysis::AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, double maxevents, double xsec, double total_events_for_xsection, int nfiles) 
 {
   	std::cout << "AddMCSignalSampleFiles starts " << id << std::endl << std::endl;
 
@@ -118,7 +121,7 @@ void CMSAnalysis::AddMCSignalSampleFiles(const TString& id, const TString& dir, 
 	_SampleInfo[_SampleInfo.size()-1].SampleFlag = "isMCSignal";  // set signal flag to true
       	//_sampleNFiles.push_back(0);
 }
-void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const TString& file, int maxevents, double xsec, double total_events_for_xsection, int nfiles) 
+void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const TString& file, double maxevents, double xsec, double total_events_for_xsection, int nfiles) 
 {
 	//std::cout << "**ADDMCSAMPLEFILES Routine***" << std::endl;
         if (_dataIndex<0) {
@@ -172,7 +175,7 @@ void CMSAnalysis::AddFiles(TString tipo, TString name, double luminosity, double
 {
 	if (tipo== "Data") 	AddDataSampleFiles(name, path, "skimmed-nano", luminosity, ntrees);
 	if (tipo== "MCSignal") 	AddMCSignalSampleFiles(name, path, "skimmed-nano", maxevents, xsection, numberofevents, ntrees);
-	if (tipo== "MCBckgr")	{std::cout << "	***MCBckgd routine*** " << std::endl; AddMCSampleFiles(name, path, "skimmed-nano", maxevents, xsection, NumberOfEntries(path, ntrees), ntrees);}
+	if (tipo== "MCBckgr")	AddMCSampleFiles(name, path, "skimmed-nano", maxevents, xsection, numberofevents, ntrees);
 }
 
 void CMSAnalysis::AddPlot1D(const TString& name, const TString& title, int nbins, double xmin, double xmax) 
@@ -215,7 +218,6 @@ double CMSAnalysis::GettingSF_bTag(const TString& DeepCSV, const TString& WP , c
 			else
 				if(SysType == "central") 
 				{
-					//std::cout << 1.6329-0.00160255*pt+1.9899e-06*pt*pt-6.72613e-10*pt*pt*pt << std::endl;
 					return 1.6329-0.00160255*pt+1.9899e-06*pt*pt-6.72613e-10*pt*pt*pt;
 				}
 		}
@@ -294,7 +296,7 @@ double CMSAnalysis::bTagEventWeight(int nBtaggedJets, float bjetpt_1, int bjetfl
 
 void CMSAnalysis::FillPlot1D(const TString& name, const SAMPLES &sample, double value, double weight) //PileUp
 {
-/*      	for (unsigned int j=0; j<hists_1D.size(); ++j) 
+        /*for (unsigned int j=0; j<hists_1D.size(); ++j) 
 	{
 		//std::cout << hists_1D[j]->GetName() << " " << _sampleId[isample]+"_"+name << std::endl;
         	if (hists_1D[j]->GetName()==_sampleId[isample]+"_"+name) 
@@ -357,18 +359,35 @@ double CMSAnalysis::PileupReweighting(const TH1D* Ratio, const float Pileup_nTru
 	else return event_weight;
 }
 
+/*double CMSAnalysis::QCDEstimation(TString& file, int jets, double dR, double Electron_pt, double Muon_pt)
+{
+	TFile f(file);
+	RooWorkspace *w =(RooWorkspace*)f.Get("w");
+	w->var("njets")->setVal(jets);
+	w->var("deltaR")->setVal(dR);
+	w->var("e_pt")->setVal(Electron_pt);
+	w->var("m_pt")->setVal(Muon_pt);
 
-void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option) 
+	double factor_bin = w->function("em_qcd_osss_binned").getVal();
+	double factor_uncert = w->funtion("em_qcd_extrap_uncert")->getVal();
+
+	double osss = factor_bin*factor_uncert;
+
+	return osss;
+	f.Close();
+}*/
+
+void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option, const string& charge, const string& muon, const string& jets, const string& bjets) 
 {
 	std::cout << sample.SampleId << " OPTION " << option << std::endl;
 
-	TFile *f = TFile::Open(sample.SampleId+"_ToPlot_V6.root", option);
+	TFile *f = TFile::Open(sample.SampleId+Form("_ToPlot_V6_%s_%s_%s_%s.root", charge.c_str(), muon.c_str(), jets.c_str(), bjets.c_str() ), option);
+
 	for (unsigned int j=0; j<hists_1D.size(); ++j) 
 	{
         	if (hists_1D[j]->GetName()==sample.SampleId+"_"+name) 
 		{
                 	hists_1D[j]->Write();
-
             	}
       	}
 
@@ -406,9 +425,9 @@ bool CMSAnalysis::SetTreeFile(int i, int fileJ)
         //_file.GetObject("Events",_NANOTREE);
         if(_NANOTREE==NULL) return 0;
 
-        TH1F *histoEvents=(TH1F*)_file->Get("eventcount_Skim");
+        TH1 *histoEvents=(TH1*)_file->Get("eventcount");
         if(histoEvents) {
-                int nEventsFromHisto=_sampleNeventsSumFiles[i]+histoEvents->GetBinContent(1);
+                double nEventsFromHisto=_sampleNeventsSumFiles[i]+histoEvents->GetBinContent(3);//accepted (ver que el numero de sucesos de la clase mia de samples coincide con este)
                 _sampleNeventsSumFiles[i]=nEventsFromHisto;
         }
 
@@ -641,11 +660,11 @@ void CMSAnalysis::DrawPlot1D(const TString& name, const TString& suffix, const T
 				
       	}
 
-	/*if(suma==nullptr) 
+	if(suma==nullptr) 
 	{
 		std::cout << "ERROR : Histogram " << name << " not found"  << std::endl;
 		return;
-	}*/
+	}
 
 
 	RatioDataMC = (TH1D*)hData->Clone("hRatio");
@@ -678,10 +697,10 @@ void CMSAnalysis::DrawPlot1D(const TString& name, const TString& suffix, const T
 	}
 	suma_signal = (TH1D*) hSignal[0]->Clone();
 	suma_signal->SetName("sumasignal_clone");
-	//for(auto &h : hSignal)
-	//{
+	for(auto &h : hSignal)
+	{
 	suma_signal->Add(hSignal[1]);
-	//}
+	}
 
 	std::cout << "SUMA " << suma_signal->Integral() << std::endl;
 	TString c1name = "c1_" + name;
