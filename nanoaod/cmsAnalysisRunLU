@@ -10,11 +10,21 @@ else
   exit
 fi
 
-ROOTLIBS="-L/usr/lib64 `$ROOTSYS/bin/root-config --glibs` -lMathCore -lMinuit"
+ROOTLIBS="-L/usr/lib64 `$ROOTSYS/bin/root-config --glibs` -lMathCore -lMinuit -lRooFitCore -lRooFit"
 ROOTINCDIR=`$ROOTSYS/bin/root-config --incdir`
 
+#echo "ROOTLIBS: "$ROOTLIBS
+#echo "ROOTINCDIR: "$ROOTINCDIR
+
+echo "Compiling..."
 g++ -std=gnu++0x -I${ROOTINCDIR} ${fileC} CMSAnalysisLU.C SamplesClassLU.C ${ROOTLIBS} -lX11 -o ${fileEXE}
 #g++ -std=c++1y -I${ROOTINCDIR} ${fileC} CMSAnalysisLU.C ${ROOTLIBS} -lX11 -o ${fileEXE}
+#g++ -std=gnu++0x -I${ROOTINCDIR} ${fileC} ${ROOTLIBS} -lX11 -o ${fileEXE}
+
+echo "Compilation done."
+#echo $@
+
+
 ./${fileEXE} "$@"
 
 rm -f ${fileEXE}
