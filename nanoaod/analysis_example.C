@@ -43,6 +43,19 @@
 #include <TPad.h>
 //#include <RooWorkspace.h>
 
+#include "RooGlobalFunc.h"
+#include "RooDataSet.h"
+#include "RooRealVar.h"
+#include "RooAbsPdf.h"
+#include "RooFit.h"
+#include "RooFitResult.h"
+
+#include "RooEffProd.h"
+#include "RooNLLVar.h"
+#include "RooWorkspace.h"
+#include "RooDataHist.h"
+#include "RooHistPdf.h"
+
 const double electronMass = 0.0005109989461; //GeV
 const double muonMass = 0.1056583745;
 const double METMass = 0.0;
@@ -90,6 +103,7 @@ struct TopAnalysis : public CMSAnalysis
 	TString mydir = "/afs/cern.ch/work/l/lurda/CMS/May_2019/ExoticHiggsDecay/codigojuan/GitLab_NANOAOD/LFVAnalysis/nanoaod/";
 	TString dir = "/eos/user/l/lurda/CMS/SamplesAfterSkimmingNovember2019/"; 
 	TString dir2 = "/eos/user/c/cepeda/LFVNANO/Skimming3/";
+	TString dirMerge = "/eos/user/l/lurda/CMS/SamplesToMergeJanuary2020_madgraphMLM/";
 
 // Select if there are at least two leptons wit some phase space cuts
 	
@@ -309,7 +323,7 @@ struct HISTS : public CMSAnalysis
 		for(auto &name: txtFiles.HistogramsList)
 		{
 			std::cout << "Name of Histograms " << name << std::endl;
-		 	cms.DrawPlot1D(name, "", Form("png_V6_%s_%s_%s_%s", charge.c_str(), muon.c_str(), jets.c_str(), bjets.c_str() ));
+		 	cms.DrawPlot1D(name, "", Form("png_QCD_%s_%s_%s_%s", charge.c_str(), muon.c_str(), jets.c_str(), bjets.c_str() ));
 			std::cout << "Name of Histograms que se ha ploteado" << name << std::endl;
 			
 		}
@@ -397,7 +411,40 @@ struct SCALEFACTORS : public CMSAnalysis
 		return bTag_weight;
 	}
 
-	/*static double QCDEstimation(TopAnalysis &cms)
+	static double MergingSF(TopAnalysis &cms, TString sample)
+	{
+
+		//std::cout << "MERGING ROUTINE" << std::endl;
+		double merge; 
+		UInt_b(nGenJet);
+		if(sample == "WJets") 
+		{
+			//std::cout << "HOLA" << std::endl;
+
+			if(nGenJet==0) 	    {  merge = 52.22;}
+			else if(nGenJet==1) {  merge = 9.1;}
+			else if(nGenJet==2) {  merge = 7.2;}
+			else if(nGenJet==3) { merge = 4.4;}
+			else if(nGenJet==4) {  merge = 3.5;}
+			else { merge = 1.0;}
+		}
+		else if(sample == "WJets1") { merge = 9.1;}
+		else if(sample == "WJets2") { merge = 7.2;}
+		else if(sample == "WJets3") {  merge = 4.4;}
+		else if(sample == "WJets4") {  merge = 3.5;}
+		else {  merge = 1.0;}
+
+		/*double luminosity = nevents/LOxsec;
+		double LOtoNNLOfactor = NNLOxsec/LOxsec;
+
+		if(inclusive == true) double merge = SAMPLES::TotalAnalysisLumi * LOtoNNLOfactor * 1000. / inclusiveluminosity;
+		
+		else double merge = (SAMPLES::TotalAnalysisLumi * LOtoNNLOfactor * 1000. / (luminosity+inclusiveluminosity)*/
+	
+		return merge;
+	}
+
+	static double QCDEstimation(TopAnalysis &cms)
 	{
 		VFloat_b(Muon_pt);
   		VFloat_b(Muon_eta);
@@ -413,10 +460,10 @@ struct SCALEFACTORS : public CMSAnalysis
 				
 		double dR = ANGLES::DeltaR(Muon_phi[cms.Indexmusel], Electron_phi[cms.Indexelsel], Muon_eta[cms.Indexmusel], Electron_eta[cms.Indexelsel]);
 
-		osss_weight = cms.QCDEstimation(file, nJet, dR, Electron_pt, Muon_pt); 
+		osss_weight = cms.QCDEstimationFunction(file, nJet, dR, Electron_pt[cms.Indexelsel], Muon_pt[cms.Indexmusel]); 
 
 		return osss_weight;
-	}*/
+	}
 	
 };
 
@@ -431,14 +478,20 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 	//*****USING FUNCTION AddFiles ******	
   	cms.AddFiles("Data", "DataA", 14.027047499*1000., -1, cms.dir+"SingleMuon_Run2018A-Nano25Oct2019-v1_NANOAOD/", 555, -1, 227489240);
   	cms.AddFiles("Data", "DataB", 7.060622497*1000.,  -1, cms.dir+"SingleMuon_Run2018B-Nano25Oct2019-v1_NANOAOD/", 264, -1, 110446445);
-  	cms.AddFiles("Data", "DataC", 6.894770971*1000.,  -1, cms.dir+"SingleMuon_Run2018C-Nano25Oct2019-v1_NANOAOD/", 264, -1, 107972995);
+  	cms.AddFiles("Data", "DataC", 6.894770971*1000.,  -1, cms.dir+"SingleMuon_Run2018C-Nano25Oct2019-v1_NANOAOD/", 264, -1, 107972995);//264
   	cms.AddFiles("Data", "DataD", 31.283984136*1000., -1, cms.dir+"DeMaria_SingleMuon_Run2018D-Nano25Oct2019-v1_NANOAOD/", 1238, -1, -1);
 	
   	cms.AddFiles("MCSignal", "GG",  -1, 48.58*0.1,  cms.dir+"GluGlu_LFV_HToMuTau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8_RunI0-v1_NANOAODSIM/", 1,  maxevents, 42945741.6072);
  	cms.AddFiles("MCSignal", "VBF", -1, 3.782*0.1,  cms.dir+"VBF_LFV_HToMuTau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8_RunIIAu0-v1_NANOAODSIM/", 1,  maxevents, 7631474.65134);
 	
   	cms.AddFiles("MCBckgr", "WW",    -1, 12.15488,  cms.dir+"WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv0-v1_NANOAODSIM/",  5,  maxevents, 85917643.789);
-  	cms.AddFiles("MCBckgr", "WJets", -1, 61526.7,   cms.dir+"WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv6-0-v1_NANOAODSIM/", 11,  maxevents, 70389866.8084);
+
+  	cms.AddFiles("MCBckgr", "WJets", -1, 52940.0,   cms.dirMerge+"WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv6-0-v1_NANOAODSIM/", 11,  maxevents, 70389866.8084);//61526
+	cms.AddFiles("MCBckgr", "WJets1", -1, 8104.0,   cms.dirMerge+"W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 9, maxevents, 51041402.2428);
+	cms.AddFiles("MCBckgr", "WJets2", -1, 2793.0,   cms.dirMerge+"W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 8, maxevents, 23268796.8198);
+	cms.AddFiles("MCBckgr", "WJets3", -1, 992.5 ,   cms.dirMerge+"W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 4, maxevents, 14489898.9086);
+	cms.AddFiles("MCBckgr", "WJets4", -1, 544.3 ,   cms.dirMerge+"W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 3, maxevents, 10059700.497);
+
   	cms.AddFiles("MCBckgr", "TW",    -1, 35.85,     cms.dir+"ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIAutum1-v1_NANOAODSIM/",  3,  maxevents, 334874732.0);
   	cms.AddFiles("MCBckgr", "TbarW", -1, 35.85,     cms.dir+"ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIA1-v1_NANOAODSIM/",  4,  maxevents, 266470418.054);
   	cms.AddFiles("MCBckgr", "TTbar", -1, 85.172,    cms.dir2+"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019/", 13,  maxevents, 4.622139340935600e+09);
@@ -512,7 +565,7 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 			{
           	 		// Set next entry
            	 		if (cms.SetEntry(iEvent)<0) {std::cout << "WARNING: PROBLEMS READING NTUPLES" << std::endl; break;}
- 				
+
            	 		// Preselect (summary branch must be read before)
            	 		if (!cms.Preselect()) continue;
 
@@ -536,11 +589,14 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 
 				double osss_weight = 1.0;
 				
-				//osss_weight = SCALEFACTORS::QCDEstimation(cms);
+				double merge = 1.0;
+
+				osss_weight = SCALEFACTORS::QCDEstimation(cms);
 
 				////if(!xsmp.GetSampleId().Contains("Data"))	
 				if(!cms.GetSampleId(iSample).Contains("Data"))
 				{	
+					//std::cout << "CALCULANDO PESOS" << std::endl;
 					Pileup_weight = SCALEFACTORS::PileupSF(cms, Ratio);
 
 					Generator_weight = SCALEFACTORS::GeneratorWeightSF(cms);
@@ -554,11 +610,13 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 					Trigger_weight	= SCALEFACTORS::TriggerSF(cms, TriggerHLTIsoMu24ScaleFactorHistogram);
 
 					Btag_weight = SCALEFACTORS::BtaggingSF(cms, char(argv[4][0]));
+
+					merge = SCALEFACTORS::MergingSF(cms, cms.GetSampleId(iSample));
 					
 				}
 				else if( (string(argv[3]) != "0jets" && string(argv[4]) == "0bjets")  && cms.IndexMedjetsel.size()>0 ) continue; 
 
-				double event_weight = Pileup_weight * MuonTightIDEff_weight * MuonTightISOEff_weight * ElectronEff_weight * Trigger_weight * Btag_weight * Generator_weight;
+				double event_weight = Pileup_weight * MuonTightIDEff_weight * MuonTightISOEff_weight * ElectronEff_weight * Trigger_weight * Btag_weight * Generator_weight * merge;
 
 				/*std::cout << "Pileup_weight " << Pileup_weight << std::endl;
 				std::cout << "		MuonTightIDEff_weight " << MuonTightIDEff_weight << std::endl;
@@ -567,10 +625,14 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 				std::cout << "					Trigger_weight " << Trigger_weight << std::endl;
 				std::cout << "						bTag_weight " << Btag_weight << std::endl;
 				std::cout << "							generator_weight " << Generator_weight << std::endl;
-				std::cout << "								OSSS " << osss_weight << std::endl;
-				std::cout << " 									Total calculated Weight " << event_weight << std::endl << std::endl;*/
+				std::cout << "								osss_weight " << osss_weight << std::endl;
+				std::cout << "									merging " << merge << std::endl;
+				std::cout << " 										Total calculated Weight " << event_weight << std::endl << std::endl;*/
 
-				HISTS::Fill(cms, cms._SampleInfo[iSample], event_weight);
+				if(string(argv[1]) == "OS") HISTS::Fill(cms, cms._SampleInfo[iSample], event_weight);
+
+				if(string(argv[1]) == "SS") HISTS::Fill(cms, cms._SampleInfo[iSample], event_weight*osss_weight);
+
 				////HISTS::Fill(cms, xsmp, event_weight);						
       			}			
 		}
@@ -585,8 +647,9 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
   	auto app = new TRint("Top Analysis", &argc, argv); 
 
   	//if(string(argv[7]) == "Draw") 
-	if(nsamples>1) HISTS::Draw(cms, txtFiles, string(argv[1]), string(argv[2]), string(argv[3]), string(argv[4])); //he puesto que si pones mas de una sample, pinte, sino solo guarda el histograma
+	//if(nsamples>1) HISTS::Draw(cms, txtFiles, string(argv[1]), string(argv[2]), string(argv[3]), string(argv[4])); //he puesto que si pones mas de una sample, pinte, sino solo guarda el histograma
 
+	//HISTS::QCDHistogram()
   	// To see things interactively (commnent otherwise) 
   	if (!gROOT->IsBatch()) app->Run();
 
@@ -670,7 +733,7 @@ bool TopAnalysis::Select(char* argv[])
 
   	}
 	if (nmusel!=1) return false; 
-	
+
 	//Once I have selected both muon and electron, I want to check if the sum of their charges is neutral
 
 	if (string(argv[1]) == "OS" && Electron_charge[Indexelsel]+Muon_charge[Indexmusel] != 0) return false; // Opposite charge
@@ -692,7 +755,7 @@ bool TopAnalysis::Select(char* argv[])
 		Indexjetsel.push_back(ij);
 
 	}
-	
+
 	for(auto &ij : Indexjetsel)
 	{
       		//if (string(argv[5]) == "Medium" && Jet_btagDeepB[ij]>btagMediumCut) 
@@ -711,7 +774,7 @@ bool TopAnalysis::Select(char* argv[])
       		}*/
 
   	}
-  
+
   	if (Indexjetsel.size()>2) return false; 
 
 	     if(string(argv[3])=="0jets" && string(argv[4])=="0bjets" && (Indexjetsel.size()==0 && IndexMedjetsel.size()==0) )  return true; 

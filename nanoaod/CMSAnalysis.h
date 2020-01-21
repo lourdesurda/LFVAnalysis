@@ -85,7 +85,7 @@ class CMSAnalysis {
 	double PileupReweighting(const TH1D* Ratio, const float Pileup_nTrueInt);
 	double ScaleFactors(const TH2D* SFHistogram, float lepton_variable1, float lepton_variable2);
 	///
-	double QCDEstimation(TString& file, int jets, double dR, double Electron_pt, double Muon_pt);
+	double QCDEstimationFunction(TString& file, int jets, double dR, float Electron_pt, float Muon_pt);
 	void SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option, const string& charge, const string& muon, const string& jets, const string& bjets);
       /// Fill histogram for the 1D Plot with only one component
       //void FillPlot1D_bare(const TString& name, double value, double weight=1.);

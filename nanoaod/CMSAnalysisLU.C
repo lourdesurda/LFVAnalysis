@@ -23,6 +23,19 @@
 #include "TString.h"
 //#include "RooWorkspace.h"
 
+#include "RooGlobalFunc.h"
+#include "RooDataSet.h"
+#include "RooRealVar.h"
+#include "RooAbsPdf.h"
+#include "RooFit.h"
+#include "RooFitResult.h"
+
+#include "RooEffProd.h"
+#include "RooNLLVar.h"
+#include "RooWorkspace.h"
+#include "RooDataHist.h"
+#include "RooHistPdf.h"
+
 TTree* CMSAnalysis::_NANOTREE = NULL;
 std::vector<TBranch*> CMSAnalysis::_BUFFERBRANCHES = {NULL};
 std::vector<Char_t> CMSAnalysis::_BUFFER = {0};
@@ -155,7 +168,7 @@ void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const 
 
         _sampleNevents.push_back(total_events_for_xsection); //
        // _sampleWeight.push_back(_totalLuminosity/equivalent_lumi);
- 	_sampleWeight.push_back(SAMPLES::TotalAnalysisLumi/equivalent_lumi);
+ 	_sampleWeight.push_back(SAMPLES::TotalAnalysisLumi/equivalent_lumi);//este peso es asociado a la luminosidad
         _sampleNeventsSumFiles.push_back(0);//
         //_sampleNeventsTree.push_back(0);
 
@@ -359,7 +372,7 @@ double CMSAnalysis::PileupReweighting(const TH1D* Ratio, const float Pileup_nTru
 	else return event_weight;
 }
 
-/*double CMSAnalysis::QCDEstimation(TString& file, int jets, double dR, double Electron_pt, double Muon_pt)
+/*double CMSAnalysis::QCDEstimationFunction(TString& file, int jets, double dR, float Electron_pt, float Muon_pt)
 {
 	TFile f(file);
 	RooWorkspace *w =(RooWorkspace*)f.Get("w");
@@ -369,7 +382,7 @@ double CMSAnalysis::PileupReweighting(const TH1D* Ratio, const float Pileup_nTru
 	w->var("m_pt")->setVal(Muon_pt);
 
 	double factor_bin = w->function("em_qcd_osss_binned").getVal();
-	double factor_uncert = w->funtion("em_qcd_extrap_uncert")->getVal();
+	double factor_uncert = w->function("em_qcd_extrap_uncert")->getVal();
 
 	double osss = factor_bin*factor_uncert;
 
@@ -377,11 +390,35 @@ double CMSAnalysis::PileupReweighting(const TH1D* Ratio, const float Pileup_nTru
 	f.Close();
 }*/
 
+double CMSAnalysis::QCDEstimationFunction(TString& file, int jets, double dR, float Electron_pt, float Muon_pt)
+{
+
+  std::cout << dR << std::endl;
+
+  TFile f(file);
+  RooWorkspace* w = (RooWorkspace*)f.Get("w");
+  w->var("njets")->setVal(jets);
+  w->var("dR")->setVal(dR);
+  w->var("e_pt")->setVal(Electron_pt);
+  w->var("m_pt")->setVal(Muon_pt);
+
+  double factor_bin =  w->function("em_qcd_osss_binned")->getVal();
+  double factor_uncert = w->function("em_qcd_extrap_uncert")->getVal();
+
+  double osss = factor_bin * factor_uncert;
+
+  //float osss = w->function("em_qcd_osss_binned").getVal()*w->funtion("em_qcd_extrap_uncert").getVal();
+  //std::cout << "OSSS Value " << osss << std::endl;
+
+  return osss;
+  f.Close();
+}
+
 void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option, const string& charge, const string& muon, const string& jets, const string& bjets) 
 {
 	std::cout << sample.SampleId << " OPTION " << option << std::endl;
 
-	TFile *f = TFile::Open(sample.SampleId+Form("_ToPlot_V6_%s_%s_%s_%s.root", charge.c_str(), muon.c_str(), jets.c_str(), bjets.c_str() ), option);
+	TFile *f = TFile::Open(sample.SampleId+Form("_ToPlot_QCD_%s_%s_%s_%s.root", charge.c_str(), muon.c_str(), jets.c_str(), bjets.c_str() ), option);
 
 	for (unsigned int j=0; j<hists_1D.size(); ++j) 
 	{
