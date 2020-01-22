@@ -30,7 +30,7 @@ class CMSAnalysis {
       bool SetTreeFile(int i, int fileJ); 
 
 	TH1D* ReadingFileAndGettingTH1Histogram(TString path, TString histname);
-
+	RooWorkspace* ReadingFileAndGettingRooWorkspace(TString path, TString name);
 	TH2D* ReadingFileAndGettingTH2Histogram(TString path, TString histname);
       /// Access and set the entry entryNumber from the current tree. It returns 0 if OK, and -1 if there is an error or we are beyond limits. Note that it does not read in the contents of the event branches. This behavior is useful if branches are going to be read individually later. To also read all active branches, use GetEntry(entryNumber) instead
       Int_t SetEntry(int entryNumber);
@@ -85,7 +85,7 @@ class CMSAnalysis {
 	double PileupReweighting(const TH1D* Ratio, const float Pileup_nTrueInt);
 	double ScaleFactors(const TH2D* SFHistogram, float lepton_variable1, float lepton_variable2);
 	///
-	double QCDEstimationFunction(TString& file, int jets, double dR, float Electron_pt, float Muon_pt);
+	double QCDEstimationFunction(RooWorkspace *w, int jets, double dR, float Electron_pt, float Muon_pt);
 	void SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option, const string& charge, const string& muon, const string& jets, const string& bjets);
       /// Fill histogram for the 1D Plot with only one component
       //void FillPlot1D_bare(const TString& name, double value, double weight=1.);

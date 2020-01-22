@@ -2,7 +2,7 @@
 //Written by Juan Alcaraz and it had been modified by Lourdes Urda
 //August 2019
 
-
+#include <TString.h>
 #include "TROOT.h"
 #include "TSystem.h"
 #include "TRint.h"
@@ -16,7 +16,7 @@
 #include "TLegend.h"
 #include "TMath.h"
 #include "TRandom2.h"
-#include "CMSAnalysis.h"
+
 #include <vector>
 #include <TLorentzVector.h>
 #include <sys/stat.h>
@@ -41,6 +41,7 @@
 #include <new>
 #include <map>
 #include <TPad.h>
+
 //#include <RooWorkspace.h>
 
 #include "RooGlobalFunc.h"
@@ -55,6 +56,8 @@
 #include "RooWorkspace.h"
 #include "RooDataHist.h"
 #include "RooHistPdf.h"
+
+#include "CMSAnalysis.h"
 
 const double electronMass = 0.0005109989461; //GeV
 const double muonMass = 0.1056583745;
@@ -103,7 +106,8 @@ struct TopAnalysis : public CMSAnalysis
 	TString mydir = "/afs/cern.ch/work/l/lurda/CMS/May_2019/ExoticHiggsDecay/codigojuan/GitLab_NANOAOD/LFVAnalysis/nanoaod/";
 	TString dir = "/eos/user/l/lurda/CMS/SamplesAfterSkimmingNovember2019/"; 
 	TString dir2 = "/eos/user/c/cepeda/LFVNANO/Skimming3/";
-	TString dirMerge = "/eos/user/l/lurda/CMS/SamplesToMergeJanuary2020_madgraphMLM/";
+	TString dirmadgraph = "/eos/user/l/lurda/CMS/SamplesToMergeJanuary2020_madgraphMLM/";
+	TString diramcatnlo = "/eos/user/l/lurda/CMS/SamplesToMergeJanuary2020_amcatnloFXFX/";
 
 // Select if there are at least two leptons wit some phase space cuts
 	
@@ -444,7 +448,7 @@ struct SCALEFACTORS : public CMSAnalysis
 		return merge;
 	}
 
-	static double QCDEstimation(TopAnalysis &cms)
+	static double QCDEstimation(TopAnalysis &cms, RooWorkspace *w)
 	{
 		VFloat_b(Muon_pt);
   		VFloat_b(Muon_eta);
@@ -456,11 +460,11 @@ struct SCALEFACTORS : public CMSAnalysis
 
 		double osss_weight;
 
-	        TString file = "QCD/htt_scalefactors_legacy_2018.root";
+	        //TString file = "QCD/htt_scalefactors_legacy_2018.root";
 				
 		double dR = ANGLES::DeltaR(Muon_phi[cms.Indexmusel], Electron_phi[cms.Indexelsel], Muon_eta[cms.Indexmusel], Electron_eta[cms.Indexelsel]);
 
-		osss_weight = cms.QCDEstimationFunction(file, nJet, dR, Electron_pt[cms.Indexelsel], Muon_pt[cms.Indexmusel]); 
+		osss_weight = cms.QCDEstimationFunction(w, nJet, dR, Electron_pt[cms.Indexelsel], Muon_pt[cms.Indexmusel]); 
 
 		return osss_weight;
 	}
@@ -478,7 +482,7 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 	//*****USING FUNCTION AddFiles ******	
   	cms.AddFiles("Data", "DataA", 14.027047499*1000., -1, cms.dir+"SingleMuon_Run2018A-Nano25Oct2019-v1_NANOAOD/", 555, -1, 227489240);
   	cms.AddFiles("Data", "DataB", 7.060622497*1000.,  -1, cms.dir+"SingleMuon_Run2018B-Nano25Oct2019-v1_NANOAOD/", 264, -1, 110446445);
-  	cms.AddFiles("Data", "DataC", 6.894770971*1000.,  -1, cms.dir+"SingleMuon_Run2018C-Nano25Oct2019-v1_NANOAOD/", 264, -1, 107972995);//264
+  	cms.AddFiles("Data", "DataC", 6.894770971*1000.,  -1, cms.dir+"SingleMuon_Run2018C-Nano25Oct2019-v1_NANOAOD/", 1, -1, 107972995);//264
   	cms.AddFiles("Data", "DataD", 31.283984136*1000., -1, cms.dir+"DeMaria_SingleMuon_Run2018D-Nano25Oct2019-v1_NANOAOD/", 1238, -1, -1);
 	
   	cms.AddFiles("MCSignal", "GG",  -1, 48.58*0.1,  cms.dir+"GluGlu_LFV_HToMuTau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8_RunI0-v1_NANOAODSIM/", 1,  maxevents, 42945741.6072);
@@ -486,19 +490,28 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 	
   	cms.AddFiles("MCBckgr", "WW",    -1, 12.15488,  cms.dir+"WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv0-v1_NANOAODSIM/",  5,  maxevents, 85917643.789);
 
-  	cms.AddFiles("MCBckgr", "WJets", -1, 52940.0,   cms.dirMerge+"WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv6-0-v1_NANOAODSIM/", 11,  maxevents, 70389866.8084);//61526
-	cms.AddFiles("MCBckgr", "WJets1", -1, 8104.0,   cms.dirMerge+"W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 9, maxevents, 51041402.2428);
-	cms.AddFiles("MCBckgr", "WJets2", -1, 2793.0,   cms.dirMerge+"W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 8, maxevents, 23268796.8198);
-	cms.AddFiles("MCBckgr", "WJets3", -1, 992.5 ,   cms.dirMerge+"W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 4, maxevents, 14489898.9086);
-	cms.AddFiles("MCBckgr", "WJets4", -1, 544.3 ,   cms.dirMerge+"W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 3, maxevents, 10059700.497);
+  	cms.AddFiles("MCBckgr", "WJets", -1, 52940.0,   cms.dirmadgraph+"WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv6-0-v1_NANOAODSIM/", 11,  maxevents, 70389866.8084);//61526
+	cms.AddFiles("MCBckgr", "WJets1", -1, 8104.0,   cms.dirmadgraph+"W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 9, maxevents, 51041402.2428);
+	cms.AddFiles("MCBckgr", "WJets2", -1, 2793.0,   cms.dirmadgraph+"W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 8, maxevents, 23268796.8198);
+	cms.AddFiles("MCBckgr", "WJets3", -1, 992.5 ,   cms.dirmadgraph+"W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 4, maxevents, 14489898.9086);
+	cms.AddFiles("MCBckgr", "WJets4", -1, 544.3 ,   cms.dirmadgraph+"W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 3, maxevents, 10059700.497);
+
+	/*cms.AddFiles("MCBckgr", "WJets0", -1, 544.3 ,   cms.diramcatnlo+"WJetsToLNu_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 3, maxevents, 10059700.497);
+	cms.AddFiles("MCBckgr", "WJets1", -1, 544.3 ,   cms.diramcatnlo+"WJetsToLNu_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 3, maxevents, 10059700.497);
+	cms.AddFiles("MCBckgr", "WJets2", -1, 544.3 ,   cms.diramcatnlo+"WJetsToLNu_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 3, maxevents, 10059700.497);*/
 
   	cms.AddFiles("MCBckgr", "TW",    -1, 35.85,     cms.dir+"ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIAutum1-v1_NANOAODSIM/",  3,  maxevents, 334874732.0);
   	cms.AddFiles("MCBckgr", "TbarW", -1, 35.85,     cms.dir+"ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIA1-v1_NANOAODSIM/",  4,  maxevents, 266470418.054);
-  	cms.AddFiles("MCBckgr", "TTbar", -1, 85.172,    cms.dir2+"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019/", 13,  maxevents, 4.622139340935600e+09);
-  	cms.AddFiles("MCBckgr", "DY",    -1, 2075.14*3,  cms.dir2+"DYJetsToLL_M_50_TuneCP5_13TeV_amcatnloFXFX_pythia8_RunIIAutum2019/",          29,  maxevents, 3.298665625309500e+12);
+  	//cms.AddFiles("MCBckgr", "TTbar", -1, 85.172,    cms.dir2+"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019/", 13,  maxevents, 4.622139340935600e+09);
+
+  	cms.AddFiles("MCBckgr", "DY",   -1, 2075.14*3,  cms.dir2+"DYJetsToLL_M_50_TuneCP5_13TeV_amcatnloFXFX_pythia8_RunIIAutum2019/",          29,  maxevents, 3.298665625309500e+12);
+  	/*cms.AddFiles("MCBckgr", "DY0",  -1, 2075.14*3,  cms.diramcatnlo+"DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 13,  maxevents, 5.68367119571e+11);
+  	cms.AddFiles("MCBckgr", "DY1",  -1, 2075.14*3,  cms.diramcatnlo+"DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 15,  maxevents, 4.08074701113e+11);
+  	cms.AddFiles("MCBckgr", "DY2",  -1, 2075.14*3,  cms.diramcatnlo+"DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 13,  maxevents, 1.62847517628e+11);*/
+
   	cms.AddFiles("MCBckgr", "TTbar", -1, 88.29,    cms.dir+"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019/", 13,  maxevents, 4622080234.06);
- 	cms.AddFiles("MCBckgr", "DY",    -1, 6435.0,   cms.dir+"DYJetsToLL_M_50_TuneCP5_13TeV_amcatnloFXFX_pythia8_RunIIAutum2019/",          30,  maxevents, 3.44609946801e+12);
-  	cms.AddFiles("MCBckgr", "WZ",    -1, 27.6,      cms.dir+"WZ_TuneCP5_13TeV-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_u0-v1_NANOAODSIM/",  4,  maxevents, 3884167.00546);
+ 	//cms.AddFiles("MCBckgr", "DY",    -1, 6435.0,   cms.dir+"DYJetsToLL_M_50_TuneCP5_13TeV_amcatnloFXFX_pythia8_RunIIAutum2019/",    30,  maxevents, 3.44609946801e+12);  				
+	cms.AddFiles("MCBckgr", "WZ",    -1, 27.6,      cms.dir+"WZ_TuneCP5_13TeV-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_u0-v1_NANOAODSIM/",  4,  maxevents, 3884167.00546);
   	cms.AddFiles("MCBckgr", "ZZ",    -1, 12.14,     cms.dir+"ZZ_TuneCP5_13TeV-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_u0-v1_NANOAODSIM/",  4,  maxevents, 1978776.75193);  	
 
   	// Initialize 1D histograms
@@ -531,6 +544,9 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 	//****TRIGGER HLT_IsoMu24 SCALE FACTOR****
 	TH2D* TriggerHLTIsoMu24ScaleFactorHistogram = nullptr;
 	TriggerHLTIsoMu24ScaleFactorHistogram = cms.ReadingFileAndGettingTH2Histogram(cms.mydir+"python/pyroot/Trigger_HLT_IsoMu24_weights.root", "HLT_IsoMu24_SFHist");
+
+	RooWorkspace *w = nullptr;
+	w = cms.ReadingFileAndGettingRooWorkspace(cms.mydir+"QCD/htt_scalefactors_legacy_2018.root", "w");
 	
 	////los comentarios que empiezan por //// son los correspondientes a la clase de SAMPLES que he creado para aligerar el codigo (usar cuando est'e paralelizado)
 	////for (auto &xsmp : cms._SampleInfo)
@@ -591,8 +607,10 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 				
 				double merge = 1.0;
 
-				osss_weight = SCALEFACTORS::QCDEstimation(cms);
-
+				if( !cms.GetSampleId(iSample).Contains("GG") || !cms.GetSampleId(iSample).Contains("VBF") ) 
+				{
+					osss_weight = SCALEFACTORS::QCDEstimation(cms, w);
+				}
 				////if(!xsmp.GetSampleId().Contains("Data"))	
 				if(!cms.GetSampleId(iSample).Contains("Data"))
 				{	
@@ -616,7 +634,7 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 				}
 				else if( (string(argv[3]) != "0jets" && string(argv[4]) == "0bjets")  && cms.IndexMedjetsel.size()>0 ) continue; 
 
-				double event_weight = Pileup_weight * MuonTightIDEff_weight * MuonTightISOEff_weight * ElectronEff_weight * Trigger_weight * Btag_weight * Generator_weight * merge;
+				double event_weight = Pileup_weight*MuonTightIDEff_weight*MuonTightISOEff_weight*ElectronEff_weight*Trigger_weight*Btag_weight*Generator_weight*merge;
 
 				/*std::cout << "Pileup_weight " << Pileup_weight << std::endl;
 				std::cout << "		MuonTightIDEff_weight " << MuonTightIDEff_weight << std::endl;
@@ -636,6 +654,8 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 				////HISTS::Fill(cms, xsmp, event_weight);						
       			}			
 		}
+
+		
 		//if(string(argv[6])== "SaveHistograms")
 		HISTS::Save(cms, cms._SampleInfo[iSample], txtFiles, string(argv[1]), string(argv[2]), string(argv[3]), string(argv[4]));
 		////HISTS::Save(cms, xsmp, txtFiles, string(argv[1]), string(argv[2]), string(argv[3]), string(argv[4]));
@@ -648,7 +668,7 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 
   	//if(string(argv[7]) == "Draw") 
 	//if(nsamples>1) HISTS::Draw(cms, txtFiles, string(argv[1]), string(argv[2]), string(argv[3]), string(argv[4])); //he puesto que si pones mas de una sample, pinte, sino solo guarda el histograma
-
+	//HISTS::Save(cms,  , txtFiles, string(argv[1]), string(argv[2]), string(argv[3]), string(argv[4]));
 	//HISTS::QCDHistogram()
   	// To see things interactively (commnent otherwise) 
   	if (!gROOT->IsBatch()) app->Run();

@@ -19,7 +19,7 @@
 #include "TF1.h"
 #include "TLine.h"
 #include "tdrstyle.C"
-#include "CMSAnalysis.h"
+
 #include "TString.h"
 //#include "RooWorkspace.h"
 
@@ -35,6 +35,8 @@
 #include "RooWorkspace.h"
 #include "RooDataHist.h"
 #include "RooHistPdf.h"
+
+#include "CMSAnalysis.h"
 
 TTree* CMSAnalysis::_NANOTREE = NULL;
 std::vector<TBranch*> CMSAnalysis::_BUFFERBRANCHES = {NULL};
@@ -349,6 +351,15 @@ TH2D* CMSAnalysis::ReadingFileAndGettingTH2Histogram(TString path, TString histn
 	f->Close();
 }
 
+RooWorkspace *CMSAnalysis::ReadingFileAndGettingRooWorkspace(TString path, TString name)
+{
+	TFile *f = TFile::Open(path);
+	RooWorkspace *w = (RooWorkspace*)f->Get(name);
+
+	return w;
+	f->Close();
+}
+
 double CMSAnalysis::ScaleFactors(const TH2D* SFHistogram, float lepton_variable1, float lepton_variable2)
 {
 	//std::cout << "*****Muon Efficiency routine starts" << std::endl;
@@ -390,13 +401,14 @@ double CMSAnalysis::PileupReweighting(const TH1D* Ratio, const float Pileup_nTru
 	f.Close();
 }*/
 
-double CMSAnalysis::QCDEstimationFunction(TString& file, int jets, double dR, float Electron_pt, float Muon_pt)
+double CMSAnalysis::QCDEstimationFunction(RooWorkspace *w, int jets, double dR, float Electron_pt, float Muon_pt)
 {
 
-  std::cout << dR << std::endl;
+//  std::cout << dR << std::endl;
 
-  TFile f(file);
-  RooWorkspace* w = (RooWorkspace*)f.Get("w");
+ // TFile f(file);
+ // RooWorkspace* w = (RooWorkspace*)f.Get("w");
+
   w->var("njets")->setVal(jets);
   w->var("dR")->setVal(dR);
   w->var("e_pt")->setVal(Electron_pt);
@@ -411,7 +423,7 @@ double CMSAnalysis::QCDEstimationFunction(TString& file, int jets, double dR, fl
   //std::cout << "OSSS Value " << osss << std::endl;
 
   return osss;
-  f.Close();
+  //f.Close();
 }
 
 void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option, const string& charge, const string& muon, const string& jets, const string& bjets) 
