@@ -109,13 +109,15 @@ void CMSAnalysis::AddDataSampleFiles(const TString& id,  const TString& dir, con
         _sampleNFiles.push_back(nfiles);////PARECE QUE AQUI TAMPOCO SE USA PARA MUCHO ASI QUE SUPONGO QUE LA PODREMOS QUITAR
 	//**********************************
 	//SAMPLES ss(id, dir, file, nfiles, 1., _sampleNevents.back()/_lumi); //Defino un objeto de tipo samples
-	SAMPLES ss(id, dir, file, nfiles, 1., luminosity, "isData",  tree_tmp->GetEntriesFast()); //Defino un objeto de tipo samples
+	SAMPLES ss(id, dir,file, nfiles, 1., luminosity, "isData",  tree_tmp->GetEntriesFast()); //Defino un objeto de tipo samples
 	_SampleInfo.push_back(ss);
 	//***********************************
 
         // Printout summary for data files
      //   printf("DATA> %s - %s: luminosity: %f /pb (%f /pb), events %d\n", id.Data(), _sampleFile.back().Data(), _lumi, _totalLuminosity,_sampleNevents.back());
-	printf("		DATA> %s - %s: luminosity: %f /pb (%f /pb), events %d\n", id.Data(), _sampleFile.back().Data(), luminosity, SAMPLES::TotalAnalysisLumi ,_sampleNevents.back());
+	//printf("		DATA> %s - %s: luminosity: %f /pb (%f /pb), events %d\n", id.Data(), _sampleFile.back().Data(), luminosity, SAMPLES::TotalAnalysisLumi ,_sampleNevents.back());
+	printf("		DATA> %s - %s: luminosity: %f /pb (%f /pb), events %f\n", id.Data(), _sampleFile.back().Data(), luminosity, SAMPLES::TotalAnalysisLumi ,ss.GetSampleGenWeight());
+	std::cout << " TESTTTTT1 " << ss.SampleWeight << std::endl;
 
 }
 void CMSAnalysis::AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, double maxevents, double xsec, double total_events_for_xsection, int nfiles) 
@@ -124,11 +126,11 @@ void CMSAnalysis::AddMCSignalSampleFiles(const TString& id, const TString& dir, 
 
 	if (_dataIndex<0) 
 	{
-      		printf(">>> Warning: you should call AddDataSample first, to define the luminosity!!!\n");
-     		printf(">>> SAMPLE NOT ADDED!\n");
-      		return;
+		//SAMPLES::TotalAnalysisLumi = 59.266425103e3; //pb^-1
+      		//printf(">>> Warning: you should call AddDataSample first, to define the luminosity!!!\n");
+     		//printf(">>> SAMPLE NOT ADDED!\n");
+      		//return;
   	}
-
 
 	AddMCSampleFiles(id, dir, file,  maxevents,  xsec, total_events_for_xsection, nfiles);
   	_signalFlag[_sampleId.size()-1] = true; // set signal flag to true
@@ -136,17 +138,21 @@ void CMSAnalysis::AddMCSignalSampleFiles(const TString& id, const TString& dir, 
 	_SampleInfo[_SampleInfo.size()-1].SampleFlag = "isMCSignal";  // set signal flag to true
       	//_sampleNFiles.push_back(0);
 }
+//total_events_for_xsection == generator_weight
 void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const TString& file, double maxevents, double xsec, double total_events_for_xsection, int nfiles) 
 {
 	//std::cout << "**ADDMCSAMPLEFILES Routine***" << std::endl;
         if (_dataIndex<0) {
-                printf(">>> Warning: you should call AddDataSample first, to define the luminosity!!!\n");
-                printf(">>> SAMPLE NOT ADDED!\n");
-                return;
+		SAMPLES::TotalAnalysisLumi = 59.266425103e3; //pb^-1
+		//SAMPLES::TotalAnalysisLumi = 59266.425103;
+               // printf(">>> Warning: you should call AddDataSample first, to define the luminosity!!!\n");
+               // printf(">>> SAMPLE NOT ADDED!\n");
+              //  return;
+	std::cout << "_dataindex < 0: define SAMPLES::TotalAnalysisLumi = " << SAMPLES::TotalAnalysisLumi << std::endl;
+
         }
         _sampleId.push_back(id);
         _sampleFile.push_back(dir+file);
-
         _sampleNFiles.push_back(nfiles);
 
         TString filenameexample=dir+file+"_1.root";
@@ -164,35 +170,100 @@ void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const 
         //              TH1F *histoEvents=(TH1F*)file_tmp.Get("eventcount");
         //        if(histoEvents) std::cout<<histoEvents->GetBinContent(1);
 
-        double equivalent_lumi = -1;
-        if (total_events_for_xsection>0 && xsec>0) equivalent_lumi = total_events_for_xsection/xsec;
-        else {std::cout<<"Please introduce a valid number for cross section and event count before cuts for sample"<<dir<<std::endl;}
+        double equivalent_lumi = -1.;
 
+      //  if (total_events_for_xsection>0 && xsec>0) equivalent_lumi = total_events_for_xsection/xsec;
+
+        if (total_events_for_xsection>0 && xsec>0 && !id.Contains("WJets")) equivalent_lumi = total_events_for_xsection/xsec;
+	else equivalent_lumi = 1.0;
+
+	std::cout << "xsec: " << xsec << std::endl;
+	std::cout << "total_events_for_xsection: " << total_events_for_xsection << std::endl;
+	std::cout << "equivalent_lumi: " << equivalent_lumi << std::endl;
+	std::cout << "SAMPLES::TotalAnalysisLumi: " << SAMPLES::TotalAnalysisLumi << std::endl;
+
+        //else {std::cout<<"Please introduce a valid number for cross section and event count before cuts for sample"<<dir<<std::endl;}
+	//std::cout << " ******E Q U I V A L E N T L U M I ********* " << equivalent_lumi << " X SEC " << xsec << " EVENTS " << total_events_for_xsection << std::endl;
         _sampleNevents.push_back(total_events_for_xsection); //
-       // _sampleWeight.push_back(_totalLuminosity/equivalent_lumi);
+
  	_sampleWeight.push_back(SAMPLES::TotalAnalysisLumi/equivalent_lumi);//este peso es asociado a la luminosidad
+	//std::cout << " ***** SAMPLE WEIGHT ******** " << SAMPLES::TotalAnalysisLumi/equivalent_lumi << " "  << _sampleWeight[_sampleWeight.size()-1] <<std::endl;
         _sampleNeventsSumFiles.push_back(0);//
         //_sampleNeventsTree.push_back(0);
 
         int nDump = 1; while (_sampleNevents.back()/nDump>20) nDump *= 10;
         _nDump10.push_back(nDump);
 	//**************************************
+	//(const TString& id,  const TString& dir, const TString& file, int nfiles, double xsec, double luminosity, const TString Flag, long long TotalNumberOfEvents)
+
 	//SAMPLES ss(id, dir, file, nfiles,_totalLuminosity/equivalent_lumi, xsec); //Defino un objeto de tipo samples
-	SAMPLES ss(id, dir, file, nfiles, xsec, -1. ,"isMCBckg", total_events_for_xsection); //Defino un objeto de tipo samples
+	SAMPLES ss(id, dir,file, nfiles, xsec, -1. ,"isMCBckg", total_events_for_xsection); //Defino un objeto de tipo samples
+	//std::cout << "TEST 1 " << _sampleWeight[_sampleWeight.size()-1] <<std::endl;
 	_SampleInfo.push_back(ss);
+	//std::cout << "TEST 2 " << _sampleWeight[_sampleWeight.size()-1] <<std::endl;
 	//**************************************
         // Printout summary for MC samples
-        printf("MC> %s - %s: xsec %f pb, events %d, original events %d, weight %f\n", id.Data(), _sampleFile.back().Data(), _sampleXsection.back(),_sampleNevents.back(),total_events_for_xsection,_sampleWeight.back());
+	printf("MC> %s - %s: xsec %f pb, events %f, original events %f, weight %f\n", id.Data(), _sampleFile.back().Data(), _sampleXsection.back(),_sampleNevents.back(), total_events_for_xsection, _sampleWeight[_sampleWeight.size()-1]);
+	//std::cout << "TEST 3 " << _sampleWeight[_sampleWeight.size()-1] <<std::endl;
+	printf("HOLAAAA %f\n ", _sampleWeight[_sampleWeight.size()-1]);
+	//std::cout << ss.GetSampleGenWeight() << std::endl;
 
 }
 
-void CMSAnalysis::AddFiles(TString tipo, TString name, double luminosity, double xsection, TString path, int ntrees, double maxevents, double numberofevents)
+std::map<TString,double> CMSAnalysis::MergingMCSamples(std::vector<TString> ListToMerge)
+{
+		std::cout <<"MERGING ROUTINE " << std::endl;
+		std::map<TString,double> merge; 
+
+		double inclusive_luminosity = 0.0; 
+		double LOtoNNLOfactor = 0.0;
+
+		std::vector<TString>::iterator SampleFound;
+
+		for (auto &xsample : _SampleInfo)
+		{
+			TString SampleID = xsample.GetSampleId();
+
+			SampleFound = std::find(ListToMerge.begin(), ListToMerge.end(), SampleID);
+
+			if (SampleFound == ListToMerge.end()) continue;
+
+			std::cout << SampleID << " found" << std::endl;
+
+			double NNLOxsec = 61526.7;
+			
+			double luminosity = xsample.GetSampleGenWeight()/xsample.GetSampleXSection();
+
+			if(xsample.GetSampleId() == "WJets") 
+			{
+				inclusive_luminosity = luminosity;
+				LOtoNNLOfactor = NNLOxsec/xsample.GetSampleXSection();
+
+				merge[SampleID] = SAMPLES::TotalAnalysisLumi* LOtoNNLOfactor  / inclusive_luminosity;
+			
+			}
+			else 
+			{
+				merge[SampleID] = SAMPLES::TotalAnalysisLumi* LOtoNNLOfactor  / (luminosity+inclusive_luminosity);
+				//std::cout <<" MERGING ROUTINE " << SampleID << " MERGE WEIGHT " << SAMPLES::TotalAnalysisLumi * LOtoNNLOfactor / luminosity << std::endl;
+			}
+		}
+
+		return merge;
+}
+
+void CMSAnalysis::AddFiles(TString tipo, TString name, double luminosity, double xsection, TString path, int ntrees, double maxevents, double generator_weight)
 {
 	if (tipo== "Data") 	AddDataSampleFiles(name, path, "skimmed-nano", luminosity, ntrees);
-	if (tipo== "MCSignal") 	AddMCSignalSampleFiles(name, path, "skimmed-nano", maxevents, xsection, numberofevents, ntrees);
-	if (tipo== "MCBckgr")	AddMCSampleFiles(name, path, "skimmed-nano", maxevents, xsection, numberofevents, ntrees);
+	if (tipo== "MCSignal") 	AddMCSignalSampleFiles(name, path, "skimmed-nano", maxevents, xsection, generator_weight, ntrees);
+	if (tipo== "MCBckgr")	AddMCSampleFiles(name, path, "skimmed-nano", maxevents, xsection, generator_weight, ntrees);
 }
 
+void CMSAnalysis::AddSample(const char * samplefichtxtfile)
+{
+	SAMPLES ss(samplefichtxtfile);
+	_SampleInfo.push_back(ss);
+}
 void CMSAnalysis::AddPlot1D(const TString& name, const TString& title, int nbins, double xmin, double xmax) 
 {
       	//for (unsigned int i=0; i<_sampleId.size(); ++i) 
@@ -246,7 +317,7 @@ double CMSAnalysis::GettingSF_bTag(const TString& DeepCSV, const TString& WP , c
 double CMSAnalysis::bTagEventWeight(int nBtaggedJets, float bjetpt_1, int bjetflavour_1, float bjetpt_2, int bjetflavour_2, const TString& WP, const TString& SysType, int nBTags, const TString& DeepCSV)
 {
 	///'''Routine to calculate the event weight associated to btagging correction'''
-
+	//std::cout <<"holaaaaaaaaaaaaa" << std::endl;
 	if (nBtaggedJets > 2) {std::cout << "WARNING: nBtaggedJets > 2" << std::endl; return 0;}
 	if ( nBTags > 2 ) {std::cout << "WARNING: nBTags > 2" << std::endl; return 0;}
  
@@ -266,6 +337,7 @@ double CMSAnalysis::bTagEventWeight(int nBtaggedJets, float bjetpt_1, int bjetfl
     	if ( nBTags > nBtaggedJets){
 		//std::cout << " METHOD 1 " << std::endl; 
 		return 0;}
+
   	if ( nBTags==0 && nBtaggedJets==0) {
 		//std::cout << " METHOD 2 "  << std::endl;
 		 return 1;}
@@ -309,16 +381,17 @@ double CMSAnalysis::bTagEventWeight(int nBtaggedJets, float bjetpt_1, int bjetfl
 
 }
 
+//void CMSAnalysis::FillPlot1D(const TString& name, int isample, double value, double weight) //PileUp
 void CMSAnalysis::FillPlot1D(const TString& name, const SAMPLES &sample, double value, double weight) //PileUp
 {
-        /*for (unsigned int j=0; j<hists_1D.size(); ++j) 
+       /* for (unsigned int j=0; j<hists_1D.size(); ++j) 
 	{
 		//std::cout << hists_1D[j]->GetName() << " " << _sampleId[isample]+"_"+name << std::endl;
         	if (hists_1D[j]->GetName()==_sampleId[isample]+"_"+name) 
 		{
                 	hists_1D[j]->Fill(value,_sampleWeight[isample]*weight);
 
-                  	return;
+                  	//return;
             	}
       	}*/
 	//name is the name of the histogram I wanna draw
@@ -327,7 +400,13 @@ void CMSAnalysis::FillPlot1D(const TString& name, const SAMPLES &sample, double 
 		if (hists_1D[j]->GetName()==sample.SampleId+"_"+name)
 		{	
 			//std::cout << " In FillPlot1D function, sample.SampleId_name = " << sample.SampleId+"_"+name << " coincidence " << hists_1D[j]->GetName() << std::endl;
+			//std::cout << "Filling " << sample.SampleW
+			//std::cout << "******FILLING SAMPLE " << sample.SampleId << " SampleWeight " << sample.SampleWeight << "  weight " << weight << " total " << sample.SampleWeight*weight<< std::endl;
+			//std::cout << "	" << sample.SampleFlag << "	" << sample.EquivalentLuminosity <<"	" << SAMPLES::TotalAnalysisLumi << std::endl;
+			//std::cout << "weight: " << weight << std::endl;
+			//std::cout << "sample.SampleWeight: " << sample.SampleWeight << " " << sample.SampleFlag <<std::endl;
 			hists_1D[j]->Fill(value,sample.SampleWeight*weight);
+			
 		}
 	}	
 	
@@ -430,7 +509,7 @@ void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, c
 {
 	std::cout << sample.SampleId << " OPTION " << option << std::endl;
 
-	TFile *f = TFile::Open(sample.SampleId+Form("_ToPlot_QCD_%s_%s_%s_%s.root", charge.c_str(), muon.c_str(), jets.c_str(), bjets.c_str() ), option);
+	TFile *f = TFile::Open(sample.SampleId+Form("_ToPlot_V6_%s_%s_%s_%s.root", charge.c_str(), muon.c_str(), jets.c_str(), bjets.c_str() ), option);
 
 	for (unsigned int j=0; j<hists_1D.size(); ++j) 
 	{
@@ -445,8 +524,8 @@ void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, c
 	return;
 
 } 
-bool CMSAnalysis::SetTreeFile(int i, int fileJ) 
-//bool CMSAnalysis::SetTreeFile(int i, int fileJ, const SAMPLES &sample) 
+//bool CMSAnalysis::SetTreeFile(int i, int fileJ) 
+bool CMSAnalysis::SetTreeFile(SAMPLES &sample,int fileJ) 
 {
         if (_file) {
                 _file->Close();
@@ -455,13 +534,14 @@ bool CMSAnalysis::SetTreeFile(int i, int fileJ)
 
         std::cout<<"Setting tree File"<<std::endl;
 
-        TString thisfile= _sampleFile[i]+"_"+std::to_string(fileJ)+".root";
-	//// PARA SUSTITUIR POR LA LINEA DE ARRIBA TString thisfile= sample.SampleFile[i]+"_"+std::to_string(fileJ)+".root";
+        //TString thisfile= _sampleFile[i]+"_"+std::to_string(fileJ)+".root";
+	//// PARA SUSTITUIR POR LA LINEA DE ARRIBA 
+	TString thisfile= sample.SampleFile+"_"+std::to_string(fileJ)+".root";
 
-	std::cout << "****New check in SetTreeFile: " << _sampleId[i] << " " << std::to_string(fileJ) << std::endl;
+	//std::cout << "****New check in SetTreeFile: " << _sampleId[i] << " " << std::to_string(fileJ) << std::endl;
         printf("Processing sample '%s'...\n", thisfile.Data());
 
-        _currentIndex = i;
+        //_currentIndex = i;
         _file = new TFile(thisfile,"READONLY");
 
         std::cout<<"Sample processed"<<std::endl;
@@ -475,12 +555,15 @@ bool CMSAnalysis::SetTreeFile(int i, int fileJ)
         if(_NANOTREE==NULL) return 0;
 
         TH1 *histoEvents=(TH1*)_file->Get("eventcount");
+        //if(histoEvents) {
+        //        double nEventsFromHisto=_sampleNeventsSumFiles[i]+histoEvents->GetBinContent(3);//accepted (ver que el numero de sucesos de la clase mia de samples coincide con este)
+        //        _sampleNeventsSumFiles[i]=nEventsFromHisto;
+        //}
         if(histoEvents) {
-                double nEventsFromHisto=_sampleNeventsSumFiles[i]+histoEvents->GetBinContent(3);//accepted (ver que el numero de sucesos de la clase mia de samples coincide con este)
-                _sampleNeventsSumFiles[i]=nEventsFromHisto;
+                sample.NeventsSumFiles += (long long) histoEvents->GetBinContent(3);//accepted (ver que el numero de sucesos de la clase mia de samples coincide con este)
         }
 
-        std::cout<<"SampleNeventsSumFiles " << _sampleNeventsSumFiles[i]<<  std::endl;      
+        std::cout<<"SampleNeventsSumFiles " <<sample.NeventsSumFiles <<  std::endl;      
 	
         // Reset buffer
         _BUFFERBRANCHES.clear();
@@ -594,7 +677,8 @@ Int_t CMSAnalysis::SetEntry(int entryNumber)
       if (_NANOTREE->LoadTree(entryNumber)<0) return -1;
 
       // Periodic printout, filesize dependent
-      if (entryNumber%_nDump10[_currentIndex]==0) {
+      //if (entryNumber%_nDump10[_currentIndex]==0) {
+      if (entryNumber%100000==0) {
             printf("... event index %d\n", entryNumber);
       }
 

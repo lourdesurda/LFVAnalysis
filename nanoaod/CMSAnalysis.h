@@ -25,9 +25,12 @@ class CMSAnalysis {
 	void AddMCSignalSampleFiles(const TString& id, const TString& dir, const TString& file, double maxevents, double xsec, double total_events_for_xsection, int nfiles) ;
     //  void ScalePlots();
 	void AddFiles(TString tipo, TString name, double luminosity, double xsection, TString path, int ntrees, double maxevents, double numerofevents);
+	std::map<TString, double> MergingMCSamples(std::vector<TString> ListToMerge);
+
       /// Set tree to the sample with index i
       void SetTree(int i);
-      bool SetTreeFile(int i, int fileJ); 
+     // bool SetTreeFile(int i, int fileJ); 
+	bool SetTreeFile(SAMPLES &sample, int fileJ); 
 
 	TH1D* ReadingFileAndGettingTH1Histogram(TString path, TString histname);
 	RooWorkspace* ReadingFileAndGettingRooWorkspace(TString path, TString name);
@@ -58,7 +61,7 @@ class CMSAnalysis {
       TFile* GetFile() {return _file;};
       /// Get the index of the sample currently in use
       int GetIndex() {return _currentIndex;};
-
+	void AddSample(const char * samplefichtxtfile);
       /// Get number of samples being processed
       int GetNumberOfSamples() {return _sampleId.size();};
  	/// Get number of files per sample being processed       
@@ -82,6 +85,7 @@ class CMSAnalysis {
       //void AddPlot1D_bare(const TString& name, const TString& title, int nbins, double xmin, double xmax);
       /// Fill histogram for the 1D Plot. It follows TH1 conventions.
       void FillPlot1D(const TString& name, const SAMPLES &sample, double value, double weight=1.);
+    //  void FillPlot1D(const TString& name, int isample, double value, double weight=1.);
 	double PileupReweighting(const TH1D* Ratio, const float Pileup_nTrueInt);
 	double ScaleFactors(const TH2D* SFHistogram, float lepton_variable1, float lepton_variable2);
 	///
@@ -350,7 +354,7 @@ class CMSAnalysis {
 
       };
 
- private:
+ public:
       double _lumi; ///<
       std::vector<TString> _sampleFile; ///<
       std::vector<TString> _sampleId; ///<
@@ -370,12 +374,13 @@ class CMSAnalysis {
 
       	std::vector<TH1D*> hists_1D; ///<
 	
-public:
+//public:
 	std::vector<SAMPLES> _SampleInfo;
 };
 
 #define Int_b(a) Int_t a; if (!CMSAnalysis::Set(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
 #define UInt_b(a) UInt_t a; if (!CMSAnalysis::Set(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
+#define UChar_b(a) UChar_t a; if (!CMSAnalysis::Set(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
 #define Float_b(a) Float_t a; if (!CMSAnalysis::Set(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
 #define Bool_b(a) Bool_t a; if (!CMSAnalysis::Set(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
 #define Ulong64_b(a) ULong64_t a; if (!CMSAnalysis::Set(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};

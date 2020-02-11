@@ -29,11 +29,18 @@ struct SAMPLES
 	//int	 SampleNEvents;
 	double	 SampleXSection;
 	double 	 SampleWeight = 1.;
+	double   SampleGenWeight;
 	double   IndividualLuminosity = 0.0;
+	double   EquivalentLuminosity = 0.0;
+
+	double 	 Inverted_Luminosity;
+
+	long long NeventsSumFiles;
 
 	// Constructor
 	explicit SAMPLES (const TString& id,  const TString& dir, const TString& file, int nfiles, double xsec, double luminosity, const TString Flag, long long TotalNumberOfEvents);
 	//OTRO CONSTRUCTOR PARA LOS FICHEROS
+	explicit SAMPLES(const char* samplefichtxtfile);
 	
 	// Destructor
 	~SAMPLES () {}	
@@ -48,18 +55,30 @@ struct SAMPLES
 	bool isData     () {return ((SampleFlag=="isData")?true:false);}
 
 	//Member Functions()
-	void Definitions(const TString& id,  const TString& dir, const TString& file, int nfiles, double xsec, double luminosity, const TString& Flag, long long TotalNumberOfEvents);
+	void Definitions(const TString& id,  const TString& pathfile, int nfiles, double xsec, double luminosity, const TString& Flag, long long TotalNumberOfEvents);
 
 	const TString &GetSampleId () {return SampleId;}
 	const int &GetNumberOfFilesInSample(){return SampleNFiles;}
+	
+	const double &GetSampleXSection () {return SampleXSection;}
+	const double &GetSampleGenWeight() {return SampleGenWeight;}
+	const double &GetInvertedLuminosity ()
+	{
+		Inverted_Luminosity = 1.0/EquivalentLuminosity;
+		return Inverted_Luminosity;
+	}
+
+	void Readingtxtfiles(const char* name);
+
 };
-struct FICH
+
+/*struct FICH
 {
 	explicit FICH(const char* name, const TString& SampleID, const TString& WhatIsIt, const TString& Path, double xsec, double luminosity, const int Skimmed_nano_trees, long  NumberOfEvents, double TotalEventWeight);
 
 	~FICH() {}
 
 	void Readingtxtfiles(const char* name);
-};
+};*/
 
 
