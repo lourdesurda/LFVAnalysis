@@ -19,7 +19,7 @@
 #include "TF1.h"
 #include "TLine.h"
 #include "tdrstyle.C"
-
+#include "TLeaf.h"
 #include "TString.h"
 //#include "RooWorkspace.h"
 
@@ -83,7 +83,7 @@ void CMSAnalysis::AddDataSampleFiles(const TString& id,  const TString& dir, con
 {
       //  _lumi = luminosity;
        // _totalLuminosity+=luminosity;
-	SAMPLES::TotalAnalysisLumi;
+	//SAMPLES::TotalAnalysisLumi;
         _sampleId.push_back(id);////SUSTITUIDA PERO LINEA COMENTADA
         _sampleFile.push_back(dir+file);////SUSTITUIDA PERO LINEA COMENTADA
 
@@ -143,7 +143,7 @@ void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const 
 {
 	//std::cout << "**ADDMCSAMPLEFILES Routine***" << std::endl;
         if (_dataIndex<0) {
-		SAMPLES::TotalAnalysisLumi = 59.266425103e3; //pb^-1
+		//SAMPLES::TotalAnalysisLumi = 59.266425103e3; //pb^-1
 		//SAMPLES::TotalAnalysisLumi = 59266.425103;
                // printf(">>> Warning: you should call AddDataSample first, to define the luminosity!!!\n");
                // printf(">>> SAMPLE NOT ADDED!\n");
@@ -174,7 +174,7 @@ void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const 
 
       //  if (total_events_for_xsection>0 && xsec>0) equivalent_lumi = total_events_for_xsection/xsec;
 
-        if (total_events_for_xsection>0 && xsec>0 && !id.Contains("WJets")) equivalent_lumi = total_events_for_xsection/xsec;
+        if (total_events_for_xsection>0 && xsec>0 && !id.Contains("Merge")) equivalent_lumi = total_events_for_xsection/xsec;
 	else equivalent_lumi = 1.0;
 
 	std::cout << "xsec: " << xsec << std::endl;
@@ -215,8 +215,8 @@ std::map<TString,double> CMSAnalysis::MergingMCSamples(std::vector<TString> List
 		std::cout <<"MERGING ROUTINE " << std::endl;
 		std::map<TString,double> merge; 
 
-		double inclusive_luminosity = 0.0; 
-		double LOtoNNLOfactor = 0.0;
+		double inclusive_luminosity = 1.0; 
+		double LOtoNNLOfactor = 1.0;
 
 		std::vector<TString>::iterator SampleFound;
 
@@ -230,23 +230,29 @@ std::map<TString,double> CMSAnalysis::MergingMCSamples(std::vector<TString> List
 
 			std::cout << SampleID << " found" << std::endl;
 
-			double NNLOxsec = 61526.7;
+			double NNLOxsec = 1.0;
+
+			if(xsample.GetSampleId().Contains("WJets")) NNLOxsec = 61526.7; //pb
+			else if(xsample.GetSampleId().Contains("DY")) NNLOxsec = 6077.22;//pb
 			
 			double luminosity = xsample.GetSampleGenWeight()/xsample.GetSampleXSection();
 
-			if(xsample.GetSampleId() == "WJets") 
+			if(xsample.GetSampleId().Contains("Inclusive")) 
 			{
 				inclusive_luminosity = luminosity;
 				LOtoNNLOfactor = NNLOxsec/xsample.GetSampleXSection();
-
+				//std::cout <<" MERGING ROUTINE " << SampleID << " MERGE WEIGHT " << SAMPLES::TotalAnalysisLumi * LOtoNNLOfactor / luminosity << std::endl;
+				//std::cout <<"				" << SAMPLES::TotalAnalysisLumi << " LOtoNNLOfactor " <<  LOtoNNLOfactor <<" " <<  NNLOxsec<< std::endl;
 				merge[SampleID] = SAMPLES::TotalAnalysisLumi* LOtoNNLOfactor  / inclusive_luminosity;
 			
 			}
 			else 
 			{
 				merge[SampleID] = SAMPLES::TotalAnalysisLumi* LOtoNNLOfactor  / (luminosity+inclusive_luminosity);
-				//std::cout <<" MERGING ROUTINE " << SampleID << " MERGE WEIGHT " << SAMPLES::TotalAnalysisLumi * LOtoNNLOfactor / luminosity << std::endl;
+				//std::cout <<" MERGING ROUTINE " << SampleID << " MERGE WEIGHT " << SAMPLES::TotalAnalysisLumi * LOtoNNLOfactor / (luminosity+inclusive_luminosity) << std::endl;
+				//std::cout <<"				" << SAMPLES::TotalAnalysisLumi << " LOtoNNLOfactor " <<  LOtoNNLOfactor <<" " <<  NNLOxsec << std::endl;
 			}
+			//std::cout << "FINAL VALUE " << merge[SampleID] <<" SAMPLE " << SampleID << std::endl;
 		}
 
 		return merge;
@@ -285,7 +291,7 @@ void CMSAnalysis::AddPlot1D(const TString& name, const TString& title, int nbins
 
             //	hists_1D.push_back(new TH1D(_sampleId[i]+"_"+name, title, nbins, xmin, xmax));
 		hists_1D.push_back(new TH1D(xsample.SampleId+"_"+name, title, nbins, xmin, xmax));
-            	hists_1D[hists_1D.size()-1]->Sumw2();
+            	hists_1D[hists_1D.size()-1]->Sumw2();//propagacion errores estadisticos
       }
 }
 double CMSAnalysis::GettingSF_bTag(const TString& DeepCSV, const TString& WP , const TString& SysType, int Flavour, float pt)
@@ -413,6 +419,37 @@ void CMSAnalysis::FillPlot1D(const TString& name, const SAMPLES &sample, double 
 	//std::cout << "**************************Sample Weight " << _sampleWeight[isample]  << std::endl;
 }
 
+/*std::vector<int> CMSAnalysis::LeptonPairFindingRoutine(int particle, std::vector<bool> LeptonFound, std::vector<bool> AntileptonFound, std::vector<int> indexAntilepton, std::vector<int> indexLepton)
+{
+	VInt_b(GenPart_pdgId);
+
+	std::map<bool, std::pair<int,int>> leptons;
+
+	leptons[LeptonFound[0]]     =  make_pair(11, indexLepton[0]); //ELECTRON
+	leptons[LeptonFound[1]]     =  make_pair(13, indexLepton[1]); //MUON
+	leptons[LeptonFound[2]]     =  make_pair(15, indexLepton[2]); //TAUON
+	leptons[AntileptonFound[0]] = make_pair(-11, indexAntilepton[0]); //ANTIELECTRON
+	leptons[AntileptonFound[1]] = make_pair(-13, indexAntilepton[1]); //ANTIMUON
+	leptons[AntileptonFound[2]] = make_pair(-15, indexAntilepton[2]); //ANTITAUON
+
+	std::vector<int> selectedleptons;
+	//std::cout << LeptonFound[0] << std::endl;
+	for(auto &lp : leptons)
+	{
+		if(GenPart_pdgId[particle] == lp.second.first)
+		{
+			lp.first.insert(true);
+			if(lp.second.second == -1) lp.second.second = particle; 
+		}
+
+		if(lp.first == true) selectedleptons.push_back(lp.second.second);
+	}
+
+	if(selectedleptons.size()!=2) std::cout << "NO PAIR FOUND" << std::endl;
+
+	else return selectedleptons;
+}*/
+
 TH1D* CMSAnalysis::ReadingFileAndGettingTH1Histogram(TString path, TString histname)
 {
 	TFile *f = TFile::Open(path);
@@ -453,12 +490,15 @@ double CMSAnalysis::ScaleFactors(const TH2D* SFHistogram, float lepton_variable1
 	//std::cout << "				VALUE FOR MUON EFFICIENCY INSIDE THE ROUTINE " << muon_efficiency << std::endl <<std::endl;
 	return scalefactor;
 }
-
+/*double CMSAnalysis::ZptReweighting(const TH2D* ZptHistogram, double genM, double genpT)
+{
+	
+}*/
 double CMSAnalysis::PileupReweighting(const TH1D* Ratio, const float Pileup_nTrueInt)
 {
 //	std::cout << "Pileup Reweighting routine" << std::endl;
 	double event_weight = Ratio->GetBinContent(Pileup_nTrueInt);
-	if (event_weight > 5000.) return 1;
+	if (event_weight > 10.) return 1;
 	else return event_weight;
 }
 
@@ -480,13 +520,18 @@ double CMSAnalysis::PileupReweighting(const TH1D* Ratio, const float Pileup_nTru
 	f.Close();
 }*/
 
+/*double CMSAnalysis::ZptReweighting(RooWorkspace *w, double genM, double genpT)
+{
+	w->var("z_gen_mass")->setVal(genM);
+	w->var("z_gen_pt")->setVal(genpT);
+
+	double zptweight = w->function("zptmass_weight_nom")->getVal();
+	
+	return zptweight;
+	
+}*/
 double CMSAnalysis::QCDEstimationFunction(RooWorkspace *w, int jets, double dR, float Electron_pt, float Muon_pt)
 {
-
-//  std::cout << dR << std::endl;
-
- // TFile f(file);
- // RooWorkspace* w = (RooWorkspace*)f.Get("w");
 
   w->var("njets")->setVal(jets);
   w->var("dR")->setVal(dR);
@@ -498,11 +543,8 @@ double CMSAnalysis::QCDEstimationFunction(RooWorkspace *w, int jets, double dR, 
 
   double osss = factor_bin * factor_uncert;
 
-  //float osss = w->function("em_qcd_osss_binned").getVal()*w->funtion("em_qcd_extrap_uncert").getVal();
-  //std::cout << "OSSS Value " << osss << std::endl;
-
   return osss;
-  //f.Close();
+
 }
 
 void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option, const string& charge, const string& muon, const string& jets, const string& bjets) 
@@ -582,7 +624,10 @@ bool CMSAnalysis::SetTreeFile(SAMPLES &sample,int fileJ)
                 TClass* clptr; EDataType this_type;
                 branch->GetExpectedType(clptr,this_type);
                 unsigned int content_size = TDataType::GetDataType(this_type)->Size();
-                if (branch->GetEntryOffsetLen()>0) content_size *= branch->GetMaxBaskets();
+		TString branchName = branch->GetName();// this line is new
+		TLeaf* leafCount = branch->GetLeaf(branchName)->GetLeafCount();//this line is new
+		if(leafCount) content_size *= leafCount->GetMaximum();//this line is new
+                //if (branch->GetEntryOffsetLen()>0) content_size *= branch->GetMaxBaskets();
                 bufferSize_max += content_size;
         }
 
@@ -598,7 +643,10 @@ bool CMSAnalysis::SetTreeFile(SAMPLES &sample,int fileJ)
                 TClass* clptr; EDataType this_type;
                 branch->GetExpectedType(clptr,this_type);
                 unsigned int content_size = TDataType::GetDataType(this_type)->Size();
-                if (branch->GetEntryOffsetLen()>0) content_size *= branch->GetMaxBaskets();
+		TString branchName = branch->GetName();//this line is new
+		TLeaf* leafCount = branch->GetLeaf(branchName)->GetLeafCount();//this line is new
+		if(leafCount) content_size *= leafCount->GetMaximum();//this line is new
+                //if (branch->GetEntryOffsetLen()>0) content_size *= branch->GetMaxBaskets();
                 bufferIndex += content_size;
         }
 
@@ -644,8 +692,13 @@ void CMSAnalysis::SetTree(int i)
             TClass* clptr; EDataType this_type;
             branch->GetExpectedType(clptr,this_type);
             unsigned int content_size = TDataType::GetDataType(this_type)->Size();
-            if (branch->GetEntryOffsetLen()>0) content_size *= branch->GetMaxBaskets();
-            bufferSize_max += content_size;
+	    TString branchName = branch->GetName(); // this is a new line
+	    TLeaf* leafCount = branch->GetLeaf(branchName)->GetLeafCount();//this is a new line
+            if(leafCount) content_size *=leafCount->GetMaximum(); //this is a new line
+	    bufferSize_max+= content_size;
+
+            //if (branch->GetEntryOffsetLen()>0) content_size *= branch->GetMaxBaskets();
+            //bufferSize_max += content_size;
       }
 
       _BUFFER.resize(bufferSize_max);
@@ -660,7 +713,10 @@ void CMSAnalysis::SetTree(int i)
             TClass* clptr; EDataType this_type;
             branch->GetExpectedType(clptr,this_type);
             unsigned int content_size = TDataType::GetDataType(this_type)->Size();
-            if (branch->GetEntryOffsetLen()>0) content_size *= branch->GetMaxBaskets();
+	    TString branchName = branch->GetName();//this is a new line
+	    TLeaf* leafCount = branch->GetLeaf(branchName)->GetLeafCount();//this is a new line
+	    if(leafCount) content_size *= leafCount->GetMaximum();//this is a new line
+            //if (branch->GetEntryOffsetLen()>0) content_size *= branch->GetMaxBaskets();
             bufferIndex += content_size;
       }
 
@@ -685,7 +741,7 @@ Int_t CMSAnalysis::SetEntry(int entryNumber)
       return 0;
 }
 
-void CMSAnalysis::DrawPlot1D(const TString& name, const TString& suffix, const TString& dir) //name of histogram
+/*void CMSAnalysis::DrawPlot1D(const TString& name, const TString& suffix, const TString& dir) //name of histogram
 {
       	setTDRStyle();
 	
@@ -943,7 +999,7 @@ void CMSAnalysis::DrawPlot1D(const TString& name, const TString& suffix, const T
 
       	}
 	std::cout << "TEST 3" << std::endl;
-}
+}*/
 /*void CMSAnalysis::AddMCSample(const TString& id, const TString& file, int maxevents, double xsec, int total_events_for_xsection) 
 {
 	if (_dataIndex<0) 

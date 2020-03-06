@@ -89,6 +89,7 @@ class CMSAnalysis {
 	double PileupReweighting(const TH1D* Ratio, const float Pileup_nTrueInt);
 	double ScaleFactors(const TH2D* SFHistogram, float lepton_variable1, float lepton_variable2);
 	///
+	//std::vector<int> LeptonPairFindingRoutine(int particle, std::vector<bool> LeptonFound, std::vector<bool> AntileptonFound, std::vector<int> indexAntilepton, std::vector<int> indexLepton);
 	double QCDEstimationFunction(RooWorkspace *w, int jets, double dR, float Electron_pt, float Muon_pt);
 	void SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option, const string& charge, const string& muon, const string& jets, const string& bjets);
       /// Fill histogram for the 1D Plot with only one component
@@ -387,6 +388,7 @@ class CMSAnalysis {
 
 #define VInt_b(a) Int_t* a; if (!CMSAnalysis::SetP(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
 #define VFloat_b(a) Float_t* a; if (!CMSAnalysis::SetP(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
+#define VUChar_b(a) UChar_t* a; if (!CMSAnalysis::SetP(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
 #define VBool_b(a) Bool_t* a; if (!CMSAnalysis::SetP(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
 #define String_b(a) UChar_t* a; if (!CMSAnalysis::SetP(#a,a)) {printf("Branch %s does not exists!!\n", #a); throw std::exception();};
 
