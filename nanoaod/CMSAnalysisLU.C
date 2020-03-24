@@ -107,11 +107,11 @@ void CMSAnalysis::AddDataSampleFiles(const TString& id,  const TString& dir, con
         _dataIndex = _sampleId.size()-1;///PARECE QUE SOLO SIRVE PARA COMPROBAR QUE LO PRIMERO QUE SE ADD SON LOS DATOS PERO VAYA TENIENDO CUIDADO SUPONGO QUE NO HACE FALTA
 
         _sampleNFiles.push_back(nfiles);////PARECE QUE AQUI TAMPOCO SE USA PARA MUCHO ASI QUE SUPONGO QUE LA PODREMOS QUITAR
-	//**********************************
+	//
 	//SAMPLES ss(id, dir, file, nfiles, 1., _sampleNevents.back()/_lumi); //Defino un objeto de tipo samples
 	SAMPLES ss(id, dir,file, nfiles, 1., luminosity, "isData",  tree_tmp->GetEntriesFast()); //Defino un objeto de tipo samples
 	_SampleInfo.push_back(ss);
-	//***********************************
+	//
 
         // Printout summary for data files
      //   printf("DATA> %s - %s: luminosity: %f /pb (%f /pb), events %d\n", id.Data(), _sampleFile.back().Data(), _lumi, _totalLuminosity,_sampleNevents.back());
@@ -193,7 +193,7 @@ void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const 
 
         int nDump = 1; while (_sampleNevents.back()/nDump>20) nDump *= 10;
         _nDump10.push_back(nDump);
-	//**************************************
+	//
 	//(const TString& id,  const TString& dir, const TString& file, int nfiles, double xsec, double luminosity, const TString Flag, long long TotalNumberOfEvents)
 
 	//SAMPLES ss(id, dir, file, nfiles,_totalLuminosity/equivalent_lumi, xsec); //Defino un objeto de tipo samples
@@ -201,7 +201,7 @@ void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const 
 	//std::cout << "TEST 1 " << _sampleWeight[_sampleWeight.size()-1] <<std::endl;
 	_SampleInfo.push_back(ss);
 	//std::cout << "TEST 2 " << _sampleWeight[_sampleWeight.size()-1] <<std::endl;
-	//**************************************
+	//
         // Printout summary for MC samples
 	printf("MC> %s - %s: xsec %f pb, events %f, original events %f, weight %f\n", id.Data(), _sampleFile.back().Data(), _sampleXsection.back(),_sampleNevents.back(), total_events_for_xsection, _sampleWeight[_sampleWeight.size()-1]);
 	//std::cout << "TEST 3 " << _sampleWeight[_sampleWeight.size()-1] <<std::endl;
@@ -234,19 +234,19 @@ std::map<TString,double> CMSAnalysis::MergingMCSamples(std::vector<TString> List
 
 			if(xsample.GetSampleId().Contains("WJets")) NNLOxsec = 61526.7; //pb
 			else if(xsample.GetSampleId().Contains("DY")) NNLOxsec = 6077.22;//pb
-			
+
 			double luminosity = xsample.GetSampleGenWeight()/xsample.GetSampleXSection();
 
-			if(xsample.GetSampleId().Contains("Inclusive")) 
+			if(xsample.GetSampleId().Contains("Inclusive"))
 			{
 				inclusive_luminosity = luminosity;
 				LOtoNNLOfactor = NNLOxsec/xsample.GetSampleXSection();
 				//std::cout <<" MERGING ROUTINE " << SampleID << " MERGE WEIGHT " << SAMPLES::TotalAnalysisLumi * LOtoNNLOfactor / luminosity << std::endl;
 				//std::cout <<"				" << SAMPLES::TotalAnalysisLumi << " LOtoNNLOfactor " <<  LOtoNNLOfactor <<" " <<  NNLOxsec<< std::endl;
 				merge[SampleID] = SAMPLES::TotalAnalysisLumi* LOtoNNLOfactor  / inclusive_luminosity;
-			
+
 			}
-			else 
+			else
 			{
 				merge[SampleID] = SAMPLES::TotalAnalysisLumi* LOtoNNLOfactor  / (luminosity+inclusive_luminosity);
 				//std::cout <<" MERGING ROUTINE " << SampleID << " MERGE WEIGHT " << SAMPLES::TotalAnalysisLumi * LOtoNNLOfactor / (luminosity+inclusive_luminosity) << std::endl;
@@ -287,6 +287,7 @@ void CMSAnalysis::AddPlot1D(const TString& name, const TString& title, int nbins
                         	break;
                   	}
             	}
+
             	if (existing) continue;
 
             //	hists_1D.push_back(new TH1D(_sampleId[i]+"_"+name, title, nbins, xmin, xmax));
@@ -387,35 +388,29 @@ double CMSAnalysis::bTagEventWeight(int nBtaggedJets, float bjetpt_1, int bjetfl
 
 }
 
-//void CMSAnalysis::FillPlot1D(const TString& name, int isample, double value, double weight) //PileUp
-void CMSAnalysis::FillPlot1D(const TString& name, const SAMPLES &sample, double value, double weight) //PileUp
-{
-       /* for (unsigned int j=0; j<hists_1D.size(); ++j) 
-	{
-		//std::cout << hists_1D[j]->GetName() << " " << _sampleId[isample]+"_"+name << std::endl;
-        	if (hists_1D[j]->GetName()==_sampleId[isample]+"_"+name) 
-		{
-                	hists_1D[j]->Fill(value,_sampleWeight[isample]*weight);
 
-                  	//return;
-            	}
-      	}*/
+//void CMSAnalysis::FillPlot1D(const TString& name, int isample, double value, double weight) //PileUp
+void CMSAnalysis::FillPlot1D(const TString& name, const SAMPLES &sample, double value, const TString& prefixsamplename, double weight) //PileUp
+{
 	//name is the name of the histogram I wanna draw
-	for (unsigned int j=0; j<hists_1D.size(); ++j)
-	{
-		if (hists_1D[j]->GetName()==sample.SampleId+"_"+name)
-		{	
-			//std::cout << " In FillPlot1D function, sample.SampleId_name = " << sample.SampleId+"_"+name << " coincidence " << hists_1D[j]->GetName() << std::endl;
-			//std::cout << "Filling " << sample.SampleW
-			//std::cout << "******FILLING SAMPLE " << sample.SampleId << " SampleWeight " << sample.SampleWeight << "  weight " << weight << " total " << sample.SampleWeight*weight<< std::endl;
-			//std::cout << "	" << sample.SampleFlag << "	" << sample.EquivalentLuminosity <<"	" << SAMPLES::TotalAnalysisLumi << std::endl;
-			//std::cout << "weight: " << weight << std::endl;
-			//std::cout << "sample.SampleWeight: " << sample.SampleWeight << " " << sample.SampleFlag <<std::endl;
-			hists_1D[j]->Fill(value,sample.SampleWeight*weight);
-			
+
+		TString newname;
+		for (unsigned int j=0; j<hists_1D.size(); j++)
+		{
+			if((hists_1D[j]->GetName())[0]=='Z') newname = hists_1D[j]->GetName();
+			else newname = prefixsamplename+"_"+hists_1D[j]->GetName();
+			if (newname==prefixsamplename+"_"+sample.SampleId+"_"+name)
+			//if (hists_1D[j]->GetName()==samplename+"_"+name)
+			{
+//				std::cout << "Hola1	" << hists_1D[j]->GetName() << std::endl;
+//				std::cout << "Hola2	"<< prefixsamplename << std::endl;
+				hists_1D[j]->Fill(value,sample.SampleWeight*weight);
+				if(hists_1D[j]->GetName()==prefixsamplename+"_"+sample.SampleId+"_"+name) continue;
+				else hists_1D[j]->SetName(prefixsamplename+"_"+sample.SampleId+"_"+name);
+//				std::cout<< hists_1D[j]->GetName() <<  std::endl;
+			}
+			newname = "";
 		}
-	}	
-	
 	//std::cout << "**************************Sample Weight " << _sampleWeight[isample]  << std::endl;
 }
 
@@ -553,19 +548,26 @@ void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, c
 
 	TFile *f = TFile::Open(sample.SampleId+Form("_ToPlot_V6_%s_%s_%s_%s.root", charge.c_str(), muon.c_str(), jets.c_str(), bjets.c_str() ), option);
 
-	for (unsigned int j=0; j<hists_1D.size(); ++j) 
+	/*int size = 0;
+	std::cout <<size << std::endl;
+	if(sample.SampleId.Contains("DY")) {size = hists_1D.size()*3;
+	std::cout <<size << std::endl;}
+	else size = hists_1D.size();
+	*/
+	for (unsigned int j=0; j<hists_1D.size(); ++j)
 	{
-        	if (hists_1D[j]->GetName()==sample.SampleId+"_"+name) 
+		//std::cout <<"Saving:" << hists_1D[j]->GetName() << std::endl;
+        	if( (hists_1D[j]->GetName()==sample.SampleId+"_"+name) || (hists_1D[j]->GetName()=="ZTauTau_"+sample.SampleId+"_"+name) ||
+		    (hists_1D[j]->GetName()=="ZMuMu_"+sample.SampleId+"_"+name) || (hists_1D[j]->GetName()=="ZElEl_"+sample.SampleId+"_"+name))
+		//if((hists_1D[j]->GetEntries())!=0)
 		{
+			std::cout <<"Saving:	" << hists_1D[j]->GetName()<< std::endl;
                 	hists_1D[j]->Write();
             	}
       	}
-
 	f->Close();
-
 	return;
-
-} 
+}
 //bool CMSAnalysis::SetTreeFile(int i, int fileJ) 
 bool CMSAnalysis::SetTreeFile(SAMPLES &sample,int fileJ) 
 {
@@ -822,6 +824,7 @@ Int_t CMSAnalysis::SetEntry(int entryNumber)
                         	int color = colors[mcindex%10];
                         	hists_1D[j]->SetLineWidth(3);
                         	hists_1D[j]->SetLineColor(TColor::GetColorDark(color));
+
 				//hists_1D[j]->SetLineColor(TColor::GetColorBright(color));
  				hists_1D[j]->SetMarkerStyle(7);
                         	hists_1D[j]->SetMarkerSize(0.5);

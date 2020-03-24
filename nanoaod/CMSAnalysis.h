@@ -84,7 +84,7 @@ class CMSAnalysis {
       /// Book 1D Plot for just one component
       //void AddPlot1D_bare(const TString& name, const TString& title, int nbins, double xmin, double xmax);
       /// Fill histogram for the 1D Plot. It follows TH1 conventions.
-      void FillPlot1D(const TString& name, const SAMPLES &sample, double value, double weight=1.);
+      void FillPlot1D(const TString& name, const SAMPLES &sample, double value, const TString& prefixsamplename, double weight=1.);
     //  void FillPlot1D(const TString& name, int isample, double value, double weight=1.);
 	double PileupReweighting(const TH1D* Ratio, const float Pileup_nTrueInt);
 	double ScaleFactors(const TH2D* SFHistogram, float lepton_variable1, float lepton_variable2);
