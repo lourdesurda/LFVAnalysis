@@ -1,0 +1,18 @@
+#Sample ID
+WplusHTauTau
+#Sample Flag
+isMCBckg
+#Sample file (dir+file)
+/eos/user/l/lurda/CMS/Samples14Feb2020/WplusHToTauTau_M125_13TeV_powheg_pythia8_RunIIAutumn18NanoAODv6-Nano0-v1_NANOAODSIM/skimmed-nano
+#Sample XSection [pb] 
+0.0527
+#Sample NFiles (number of VALID trees)
+7
+#Real number of trees 7
+#Total number of entries in the original sample (Taken from Oscar's python macro)--> nanoaod --> python/RootLUSampleCheck.py
+3784600.0
+#Total event weight
+3282392.48657
+#DAS Entries 2000000
+#Name of the sample from DAS
+#dataset=/WplusHToTauTau_M125_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM 

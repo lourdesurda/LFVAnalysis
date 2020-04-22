@@ -1,0 +1,18 @@
+#Sample ID
+TTbar
+#Sample Flag
+isMCBckg
+#Sample file (dir+file)
+/eos/user/l/lurda/CMS/SamplesAfterSkimmingNovember2019/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv6-Nano250-v1_NANOAODSIM/skimmed-nano
+#Sample xsection [pb]
+88.29
+#Sample NFiles (number of VALID trees)
+59
+#Real number of files 59
+#Total number of events in the original sample (Taken from Oscar's python macro)--> nanoaod --> python/RootLUSampleCheck.py
+64120000.0
+#Total events weight
+4622080234.06
+#DAS Events 64120000.0
+#Name of the sample from DAS 
+#dataset=/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM

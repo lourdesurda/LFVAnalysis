@@ -1,0 +1,18 @@
+#Sample ID
+DataB
+#Sample Flag
+isData
+#Sample file (dir+file)
+/eos/user/l/lurda/CMS/SamplesAfterSkimmingNovember2019/SingleMuon_Run2018B-Nano25Oct2019-v1_NANOAOD/skimmed-nano
+#Luminosity [pb-1]
+7060.622497
+#Sample NFiles (number of VALID trees)
+264
+#Real number of trees 264
+#Total number of entries in the original sample (Taken from Oscar's python macro)--> nanoaod --> python/RootLUSampleCheck.py
+110446445.0
+#Total event weight
+110446445.0
+#DAS Entries 119918017
+#Name of the sample from DAS 
+#dataset=/SingleMuon/Run2018B-Nano25Oct2019-v1/NANOAOD 

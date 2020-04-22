@@ -1,0 +1,18 @@
+#Sample ID
+DY2Merge
+#Sample Flag
+isMCBckg
+#Sample file (dir+file)
+/eos/user/l/lurda/CMS/SamplesToMergeJanuary2020_amcatnloFXFX/DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/skimmed-nano
+#Sample xsection [pb] //304.4pb is the xsec for DY2 madgraph
+304.4
+#Sample NFiles (number of VALID trees)
+13
+#Real number of files 13
+#Total number of events in the original sample (Taken from Oscar's python macro)--> nanoaod --> python/RootLUSampleCheck.py
+61848731.0
+#Total events weight
+1.62847517628e+11
+#DAS Events
+#Name of the sample from DAS
+#dataset=/DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM 

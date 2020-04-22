@@ -1,0 +1,18 @@
+#Sample ID
+WJetsInclusiveMerge
+#Sample Flag
+isMCBckg
+#Sample file (dir+file)
+/eos/user/l/lurda/CMS/SamplesToMergeJanuary2020_madgraphMLM/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv6-0-v1_NANOAODSIM/skimmed-nano
+#Sample xsection [pb]//61526.7
+52940.0
+#Sample NFiles (number of VALID trees)
+11
+#Number of real files 11
+#Total number of events in the original sample (Taken from Oscar's python macro)--> nanoaod --> python/RootLUSampleCheck.py
+70454125.0
+#Total event weight
+70389866.8084
+#DAS Events 70454125.0
+#Name of the sample from DAS 
+#dataset=/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
