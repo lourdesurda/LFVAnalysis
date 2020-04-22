@@ -114,17 +114,12 @@ struct TopAnalysis : public CMSAnalysis
 	int ntauonveto;
 
 	TString mydir = "/afs/cern.ch/work/l/lurda/CMS/May_2019/ExoticHiggsDecay/codigojuan/GitLab_NANOAOD/LFVAnalysis/nanoaod/";
-	//TString dir = "/eos/user/l/lurda/CMS/SamplesAfterSkimmingNovember2019/"; 
-	//TString dir2 = "/eos/user/c/cepeda/LFVNANO/Skimming3/";
-	//TString dirmadgraph = "/eos/user/l/lurda/CMS/SamplesToMergeJanuary2020_madgraphMLM/";
-	//TString diramcatnlo = "/eos/user/l/lurda/CMS/SamplesToMergeJanuary2020_amcatnloFXFX/";
 
-// Select if there are at least two leptons wit some phase space cuts
-	
-  	const double ptmuCut = 24.;//25 //WE HAVE TO SET IT TO 26
+	// Select if there are at least two leptons wit some phase space cuts
+  	const double ptmuCut = 26.;//25 //WE HAVE TO SET IT TO 26
   	const double etamuCut = 2.4;//2.5
   	const double isomuCut = 0.15;
-  	const double ptelCut = 13.;//10
+  	const double ptelCut = 10.;//10
   	const double etaelCut = 2.4;
   	const double isoelCut = 0.06;//0.10
   	const double ptjtCut = 30.; //take it into account for Bjets//30
@@ -134,6 +129,7 @@ struct TopAnalysis : public CMSAnalysis
   	const double btagTightCut = 0.7527;//0.9535 ; // tight btag point pfCSV
 
 };
+
 struct ASCII
 {
 		std::map<std::string, double> Samples;
@@ -148,7 +144,7 @@ struct ASCII
 				txtfile >> input;
 				if(txtfile.eof()) break;
 				if (input!= " ") HistogramsList.push_back (input);
-	
+
 			}while (true);
 			txtfile.close();
 		}
@@ -446,7 +442,7 @@ struct SCALEFACTORS : public CMSAnalysis
 			Muon_weight = cms.ScaleFactors(MuonEfficiencyHist, Muon_pt[cms.Indexmusel], fabs(Muon_eta[cms.Indexmusel]));
 		}
 
-		if(Muon_weight == 0) std::cout <<  Muon_pt[cms.Indexmusel] << " eta " << fabs(Muon_eta[cms.Indexmusel]) << std::endl;
+//		if(Muon_weight == 0) std::cout <<  Muon_pt[cms.Indexmusel] << " eta " << fabs(Muon_eta[cms.Indexmusel]) << std::endl;
 		return Muon_weight;
 
 	}
@@ -466,7 +462,7 @@ struct SCALEFACTORS : public CMSAnalysis
   		VFloat_b(Muon_eta);
 
 		double Trigger_weight	= cms.ScaleFactors(TriggerHist, Muon_pt[cms.Indexmusel], fabs(Muon_eta[cms.Indexmusel]));
-		if(cms.ptmuCut == 24 && Trigger_weight == 0) Trigger_weight = 1.0;
+//		if(cms.ptmuCut == 24 && Trigger_weight == 0) Trigger_weight = 1.0;
 	 //	std::cout << "Muon_pt " << Muon_pt[cms.Indexmusel] << " Muon_eta " << Muon_eta[cms.Indexmusel] << std::endl;
 		return Trigger_weight;
 	}
@@ -692,7 +688,7 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 	SAMPLES::TotalAnalysisLumi = 59.266425103E3; //pb^-1
 
 	//----- ADDING DATA SAMPLES
-	cms.AddSample("SamplesDirectoryV6/Data/SingleMuRun2018A_V6.txt");
+/*	cms.AddSample("SamplesDirectoryV6/Data/SingleMuRun2018A_V6.txt");
 	cms.AddSample("SamplesDirectoryV6/Data/SingleMuRun2018B_V6.txt");
 	cms.AddSample("SamplesDirectoryV6/Data/SingleMuRun2018C_V6.txt");
 	cms.AddSample("SamplesDirectoryV6/Data/SingleMuRun2018D_V6.txt");
@@ -718,7 +714,7 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 		cms.AddSample("SamplesDirectoryV6/WJets/W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM.txt");
 		cms.AddSample("SamplesDirectoryV6/WJets/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM.txt");
 		cms.AddSample("SamplesDirectoryV6/WJets/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM.txt");
-
+*/
 		//-DY
 /*		cms.AddSample("SamplesDirectoryV6/DYmadgraph/DYJetsToLL_M_50_TuneCP5_13TeV_madgraphMLM_pythia8_RunIIAutum2019.txt");
 		cms.AddSample("SamplesDirectoryV6/DYmadgraph/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18Nano0-v1_NANOAODSIM.txt");
@@ -727,8 +723,7 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 		cms.AddSample("SamplesDirectoryV6/DYmadgraph/DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18Nano0-v1_NANOAODSIM.txt");
 		cms.AddSample("SamplesDirectoryV6/DYamcatnlo/DYJetsToLL_M_50_TuneCP5_13TeV_amcatnloFXFX_pythia8_RunIIAutum2019.txt");
 */
-
-                cms.AddSample("SamplesDirectoryV6/ZTauTauDY/ZTauTau_DYJetsToLL_M_50_TuneCP5_13TeV_madgraphMLM_pythia8_RunIIAutum2019.txt");
+/*                cms.AddSample("SamplesDirectoryV6/ZTauTauDY/ZTauTau_DYJetsToLL_M_50_TuneCP5_13TeV_madgraphMLM_pythia8_RunIIAutum2019.txt");
                 cms.AddSample("SamplesDirectoryV6/ZTauTauDY/ZTauTau_DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18Nano0-v1_NANOAODSIM.txt");
                 cms.AddSample("SamplesDirectoryV6/ZTauTauDY/ZTauTau_DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18Nano0-v1_NANOAODSIM.txt");
                 cms.AddSample("SamplesDirectoryV6/ZTauTauDY/ZTauTau_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18Nano0-v1_NANOAODSIM.txt");
@@ -748,7 +743,7 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
                 cms.AddSample("SamplesDirectoryV6/ZEleEleDY/ZEleEle_DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18Nano0-v1_NANOAODSIM.txt");
                 cms.AddSample("SamplesDirectoryV6/ZEleEleDY/ZEleEle_DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18Nano0-v1_NANOAODSIM.txt");
                 cms.AddSample("SamplesDirectoryV6/ZEleEleDY/ZEleEle_DYJetsToLL_M_50_TuneCP5_13TeV_amcatnloFXFX_pythia8_RunIIAutum2019.txt");
-
+*/
 		//Samples to Merge AMCATNLO
 
 		//-WJETS
@@ -762,12 +757,12 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 		cms.AddSample("SamplesDirectoryV6/DYamcatnlo/DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM");
 		cms.AddSample("SamplesDirectoryV6/DYamcatnlo/DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM");*/
 
-	cms.AddSample("SamplesDirectoryV6/tW/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIAutum1-v1_NANOAODSIM_V6.txt");
+/*	cms.AddSample("SamplesDirectoryV6/tW/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIAutum1-v1_NANOAODSIM_V6.txt");
 	cms.AddSample("SamplesDirectoryV6/tW/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIA1-v1_NANOAODSIM_V6.txt");
-
+*/
 	cms.AddSample("SamplesDirectoryV6/TTbar/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM.txt");
 	cms.AddSample("SamplesDirectoryV6/TTbar/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019.txt");
-
+/*
         cms.AddSample("SamplesDirectoryV6/Z/ZZ_TuneCP5_13TeV-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_u0-v1_NANOAODSIM_V6.txt");
        	cms.AddSample("SamplesDirectoryV6/W/WZ_TuneCP5_13TeV-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_u0-v1_NANOAODSIM_V6.txt");
 
@@ -780,35 +775,7 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 	cms.AddSample("SamplesDirectoryV6/EWK/EWKWPlus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8_RunIIAutumn0-v1_NANOAODSIM.txt");
 	cms.AddSample("SamplesDirectoryV6/EWK/EWKZ2Jets_ZToLL_M-50_TuneCP5_PSweights_13TeV-madgraph-pythia8_RunIIA0-v1_NANOAODSIM.txt");
 	cms.AddSample("SamplesDirectoryV6/EWK/EWKZ2Jets_ZToNuNu_TuneCP5_PSweights_13TeV-madgraph-pythia8_RunIIAutu0-v1_NANOAODSIM.txt");
-
-	//OLD WAY OF ADDING SAMPLES
-  	/*cms.AddFiles("Data", "DataA", 14.027047499*1000., -1, cms.dir+"SingleMuon_Run2018A-Nano25Oct2019-v1_NANOAOD/", 555, -1, 227489240);///555//   Units = [1/picobarn]
-  	cms.AddFiles("Data", "DataB", 7.060622497*1000.,  -1, cms.dir+"SingleMuon_Run2018B-Nano25Oct2019-v1_NANOAOD/", 264, -1, 110446445);//264
-  	cms.AddFiles("Data", "DataC", 6.894770971*1000.,  -1, cms.dir+"SingleMuon_Run2018C-Nano25Oct2019-v1_NANOAOD/", 264, -1, 107972995);//264
-  	cms.AddFiles("Data", "DataD", 31.283984136*1000., -1, cms.dir+"DeMaria_SingleMuon_Run2018D-Nano25Oct2019-v1_NANOAOD/", 1238, -1, -1);//1238
-  	cms.AddFiles("MCSignal", "GG",  -1, 48.58*0.1,  cms.dir+"GluGlu_LFV_HToMuTau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8_RunI0-v1_NANOAODSIM/", 1,  maxevents, 42945741.6072);
- 	cms.AddFiles("MCSignal", "VBF", -1, 3.782*0.1,  cms.dir+"VBF_LFV_HToMuTau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8_RunIIAu0-v1_NANOAODSIM/", 1,  maxevents, 7631474.65134);	
-  	cms.AddFiles("MCBckgr", "WW",    -1, 12.15488,  cms.dir+"WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv0-v1_NANOAODSIM/",  5,  maxevents, 85917643.789);
-  	cms.AddFiles("MCBckgr", "WJets", -1, 52940.0,   cms.dirmadgraph+"WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv6-0-v1_NANOAODSIM/", 11,  maxevents, 70389866.8084);//61526//11
-	cms.AddFiles("MCBckgr", "WJets1", -1, 8104.0,   cms.dirmadgraph+"W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 9, maxevents, 51041402.2428);//9
-	cms.AddFiles("MCBckgr", "WJets2", -1, 2793.0,   cms.dirmadgraph+"W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 8, maxevents, 23268796.8198);//8
-	cms.AddFiles("MCBckgr", "WJets3", -1, 992.5 ,   cms.dirmadgraph+"W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 4, maxevents, 14489898.9086);//4
-	cms.AddFiles("MCBckgr", "WJets4", -1, 544.3 ,   cms.dirmadgraph+"W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18NanoAODv60-v1_NANOAODSIM/", 3, maxevents, 10059700.497);//3
-	cms.AddFiles("MCBckgr", "WJets0", -1, 544.3 ,   cms.diramcatnlo+"WJetsToLNu_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 3, maxevents, 10059700.497);
-	cms.AddFiles("MCBckgr", "WJets1", -1, 544.3 ,   cms.diramcatnlo+"WJetsToLNu_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 3, maxevents, 10059700.497);
-	cms.AddFiles("MCBckgr", "WJets2", -1, 544.3 ,   cms.diramcatnlo+"WJetsToLNu_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 3, maxevents, 10059700.497);
-  	cms.AddFiles("MCBckgr", "TW",    -1, 35.85,     cms.dir+"ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIAutum1-v1_NANOAODSIM/",  3,  maxevents, 334874732.0);
-  	cms.AddFiles("MCBckgr", "TbarW", -1, 35.85,     cms.dir+"ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIA1-v1_NANOAODSIM/",  4,  maxevents, 266470418.054);
-	NOUSARcms.AddFiles("MCBckgr", "DY",   -1, 2075.14*3,  cms.dir2+"DYJetsToLL_M_50_TuneCP5_13TeV_amcatnloFXFX_pythia8_RunIIAutum2019/",          29,  maxevents, 3.298665625309500e+12);
- 	cms.AddFiles("MCBckgr", "DY",   -1,  6435.0,    cms.dir+"DYJetsToLL_M_50_TuneCP5_13TeV_amcatnloFXFX_pythia8_RunIIAutum2019/",    30,  maxevents, 3.44609946801E+12);//30			
- 	cms.AddFiles("MCBckgr", "DY",   -1,  6435.0,    cms.dir+"DYJetsToLL_M_50_TuneCP5_13TeV_amcatnloFXFX_pythia8_RunIIAutum2019/",    30,  maxevents, 8.94044e+06);//30			
-  	cms.AddFiles("MCBckgr", "DY0",  -1, 2075.14*3,  cms.diramcatnlo+"DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 13,  maxevents, 5.68367119571e+11);
-  	cms.AddFiles("MCBckgr", "DY1",  -1, 2075.14*3,  cms.diramcatnlo+"DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 15,  maxevents, 4.08074701113e+11);
-  	cms.AddFiles("MCBckgr", "DY2",  -1, 2075.14*3,  cms.diramcatnlo+"DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18NanoAO0-v1_NANOAODSIM/", 13,  maxevents, 1.62847517628e+11);
-	cms.AddFiles("MCBckgr", "TTbar", -1, 88.29,    cms.dir+"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019/", 13,  maxevents, 4622080234.06);//13
-	cms.AddFiles("MCBckgr", "WZ",    -1, 51.11,      cms.dir+"WZ_TuneCP5_13TeV-pythia8_RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_u0-v1_NANOAODSIM/",  4,  maxevents, 3884167.00546);//27.6
-  	cms.AddFiles("MCBckgr", "ZZ",    -1, 16.91,     cms.dir+"ZZ_TuneCP5_13TeV-pythia */
-
+*/
 	//Defining the lists of samples to apply the merging method
 	std::vector<TString> ListWJetsToMerge {"WJetsInclusiveMerge", "WJets1Merge", "WJets2Merge", "WJets3Merge", "WJets4Merge"};
 	std::vector<TString> ListDYToMerge {"DYInclusiveMerge", "DY1Merge", "DY2Merge", "DY3Merge", "DY4Merge"};
@@ -887,95 +854,89 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 //			if (nevents>1000) nevents=1000;
 
 			std::cout << "Reading entries in this file: " << nevents << std::endl;
-
+			//[#startingloopevent]
       			for (long long iEvent=0; iEvent<nevents; iEvent++)
 			{
           	 		// Set next entry
-
            	 		if (cms.SetEntry(iEvent)<0) {std::cout << "WARNING: PROBLEMS READING NTUPLES" << std::endl; break;}
-
-           	 		// Preselect (summary branch must be read before)
+           	 		// Preselection
            	 		if (!cms.Preselect()) continue;
-
-           	 		// Select (event branch must be read before)
+           	 		// Selection
            	 		if (!cms.Select(argv)) continue;
 
-            			// Fill histograms
+            			//Declaring and starting the varialbes for the weights
 				double Pileup_weight = 1.;
-
 				double MuonTightIDEff_weight = 1.;
-
 				double MuonTightISOEff_weight = 1.;
-
 				double ElectronEff_weight = 1.0;
-
 				double Trigger_weight = 1.0;
-
 				double Btag_weight = 1.0;
-
 				double Generator_weight = 1.0;
-
 				double osss_weight = 1.0;
-
 				double merge = 1.0;
-
 				double zpt_weight = 1.0;
-
 				SCALEFACTORS::drellyan_info x;
 
+				//[#WeightforDataandBackgroundsStarts]
 				if( xsmp.SampleFlag!="isMCSignal")
 				{
 					osss_weight = SCALEFACTORS::QCDEstimation(cms, w);
 				}
+				//[#weightforDataandBacdgroundsEnds]
 
+				//[#WeightsForSignalsandBackgroundsStarts]
 				if(!xsmp.GetSampleId().Contains("Data"))
 				{
-					//std::cout << "CALCULANDO PESOS" << std::endl;
+					//1peso: PILEUP
 					Pileup_weight = SCALEFACTORS::PileupSF(cms, Ratio);
-
+					//2peso: GENERATOR WEIGHT
 					Generator_weight = SCALEFACTORS::GeneratorWeightSF(cms);
-
+					//3peso: MUON ID
 					MuonTightIDEff_weight = SCALEFACTORS::MuonSF(cms, MuonTightIDEfficiencyHist);
-
+					//4peso: MUON ISO
 					MuonTightISOEff_weight = SCALEFACTORS::MuonSF(cms, MuonTightISOEfficiencyHist);
-
+					//5peso: ELECTRON EFFICIENCY
 					ElectronEff_weight = SCALEFACTORS::ElectronSF(cms, ElectroScaleFactorHistogram);
-
+					//6peso: TRIGGER CORRECTION
 					Trigger_weight	= SCALEFACTORS::TriggerSF(cms, TriggerHLTIsoMu24ScaleFactorHistogram);
-
+					//7peso: BTAG CORRECTION
 					Btag_weight = SCALEFACTORS::BtaggingSF(cms, char(argv[4][0]));
-
+					//8 peso: MERGE CORRECTION
 					if( xsmp.GetSampleId().Contains("Merge") && !xsmp.GetSampleId().Contains("amcatnlo"))
 					{
-						if(xsmp.GetSampleId().Contains("WJets")) 
-							merge = SCALEFACTORS::MergingSF(cms, xsmp.GetSampleId(), WJetsMergingMap);
-						else if(xsmp.GetSampleId().Contains("DY")) 
-							{
-								if(xsmp.GetSampleId().Contains("ZTauTau"))merge = SCALEFACTORS::MergingSF(cms, xsmp.GetSampleId(), DYMergingMap_ZTauTau);
-								else if(xsmp.GetSampleId().Contains("ZMuoMuo"))merge = SCALEFACTORS::MergingSF(cms, xsmp.GetSampleId(), DYMergingMap_ZMuoMuo);
-								else if(xsmp.GetSampleId().Contains("ZEleEle"))merge = SCALEFACTORS::MergingSF(cms, xsmp.GetSampleId(), DYMergingMap_ZEleEle);
-							}
+						if(xsmp.GetSampleId().Contains("WJets")) merge = SCALEFACTORS::MergingSF(cms, xsmp.GetSampleId(), WJetsMergingMap);
+						else if(xsmp.GetSampleId().Contains("DY"))
+						{
+							if(xsmp.GetSampleId().Contains("ZTauTau"))      merge = SCALEFACTORS::MergingSF(cms, xsmp.GetSampleId(), DYMergingMap_ZTauTau);
+							else if(xsmp.GetSampleId().Contains("ZMuoMuo")) merge = SCALEFACTORS::MergingSF(cms, xsmp.GetSampleId(), DYMergingMap_ZMuoMuo);
+							else if(xsmp.GetSampleId().Contains("ZEleEle")) merge = SCALEFACTORS::MergingSF(cms, xsmp.GetSampleId(), DYMergingMap_ZEleEle);
+						}
 					}
 					else merge = 1.0;
-
+					//9 peso: ZPt reweighting
 					if(xsmp.GetSampleId().Contains("DY"))
 					{
-						x= SCALEFACTORS::ZptReweighting(cms, ZptReweightingHistogram, xsmp);
+						x = SCALEFACTORS::ZptReweighting(cms, ZptReweightingHistogram, xsmp);
 						if(!xsmp.GetSampleId().Contains("amcatnlo")) zpt_weight = x.weight;
 						else zpt_weight= 1.0;
 					}
 					else zpt_weight= 1.0;
 
 				}
-
+				//[#WeightsForSignalsandBackgroundsEnds]
+				//[#btag issues starts]
 				// For the data we need a fully exclusive selection.
 				else if( string(argv[4]) == "0bjets" && cms.IndexMedjetsel.size()!=0 ) continue; 
 				else if( string(argv[4]) == "1bjet"  && cms.IndexMedjetsel.size()!=1 ) continue; 
 				else if( string(argv[4]) == "2bjets" && cms.IndexMedjetsel.size()!=2 ) continue; 
+				//[#btag issues ends]
+				//[#eventweightcalculationStarts]
+				double event_weight = 1.0;
+				//we multiply all the calculated weights
+				event_weight = Pileup_weight*MuonTightIDEff_weight*MuonTightISOEff_weight*ElectronEff_weight*Trigger_weight*Btag_weight*Generator_weight*merge*zpt_weight;
+				//[#eventweightcalculationEnds]
 
-				double event_weight = Pileup_weight*MuonTightIDEff_weight*MuonTightISOEff_weight*ElectronEff_weight*Trigger_weight*Btag_weight*Generator_weight*merge*zpt_weight;
-//                              double event_weight = Pileup_weight*MuonTightIDEff_weight*MuonTightISOEff_weight*ElectronEff_weight*Trigger_weight*Btag_weight*Generator_weight*merge;
-
+				//Printing out the event which total weight is equal to 0
 				if(event_weight  ==0.)
 				{
 				std::cout << "SAMPLE " << xsmp.GetSampleId() << std::endl;
@@ -994,118 +955,125 @@ int main(int argc, char* argv[])//"OS", "IM", "0jets", "0bjets"
 
 				}
 
-
-//				std::cout << "hola" << x.TauFlag << " " << x.MuoFlag << " " << 
-
+				//[#FULLSELECTIONSTARTS]
+				//[#FillingRoutineStarts]
+				//We have to take into account that x.Flag_Lepton will be false for all the samples except for DY_Lepton
 				if(x.TauFlag && !xsmp.GetSampleId().Contains("ZTauTau")) continue;
 				else if(x.MuoFlag && !xsmp.GetSampleId().Contains("ZMuoMuo")) continue;
 				else if(x.EleFlag && !xsmp.GetSampleId().Contains("ZEleEle")) continue;
 				else
 				{
-                	                // Filling histograms
+                	                // Filling histograms for the Opposite sign option
 					if(string(argv[1])=="OS")
 					{
-//						std::cout << "FILLING" << std::endl;
 						 HISTS::Fill(cms, xsmp, event_weight);
                                                  cms.FullSelection(argv, event_weight, xsmp);
 					}
-					else if(string(argv[1])=="SS") 
+					// Filling histograms for the Same sign option
+					else if(string(argv[1])=="SS")
 					{
-//						std::cout << "FILLING" << std::endl;
+						//Notice that we use the osss_weight, we use these histograms to get QCD distribution using OSSS method
 						HISTS::Fill(cms, xsmp, event_weight*osss_weight);
 						cms.FullSelection(argv, event_weight*osss_weight, xsmp);
 					}
 				}
-
-
-      			}//End of events loop
+				//[#FillingRoutineEnds]
+				//[#FULLSELECTIONendS]
+      			}//[#endingloopevent]
 
 		}//End of trees loop
 
 		//For every sample I am saving the histograms written down in the txt file NameOfHistograms
 		HISTS::Save(cms, xsmp, txtFiles, string(argv[1]), string(argv[2]), string(argv[3]), string(argv[4]));
-
-
   	}
-
-	//if(nsamples>1) HISTS::Draw(cms, txtFiles, string(argv[1]), string(argv[2]), string(argv[3]), string(argv[4])); //he puesto que si pones mas de una sample, pinte, sino solo guarda el histograma
-	//HISTS::Save(cms,  , txtFiles, string(argv[1]), string(argv[2]), string(argv[3]), string(argv[4]));
-	//HISTS::QCDHistogram()
-  	// To see things interactively (commnent otherwise) 
-  	//if (!gROOT->IsBatch()) app->Run();
-
   	return 0;
 }
-
+//[#MainFuncitonEnds]
+//[#PreselectionRoutineStarts]
 bool TopAnalysis::Preselect()
 {
-	// Cut on summary information to save processing time
+	// We use this preselection routine to cut on summary information to save processing time
+	//I have to declare the variables I need to use in the routine
+	//I am just goint to take the information about the number of leptons that we have in the event and the trigger we are using
   	UInt_b(nElectron);
   	UInt_b(nMuon);
 	Bool_b(HLT_IsoMu24);
-
+	//I wanna skip evetns with no electrons
 	if(nElectron==0)         return false;
-  	if(nMuon+nElectron<2) 	return false; // look for events with >= 2 leptons
+	//I wanna look for events with >= 2 leptons
+  	if(nMuon+nElectron<2) 	return false;
+	//I wanna set this trigger that match the muon cut pt I am using
 	if(!HLT_IsoMu24)        return false;
 
   	return true;    
 }
+//[#PreselectionRoutineEnds]
+
+//[#FULLselectionRoutineStarts]
 bool TopAnalysis::FullSelection(char *argv[], double eventweight, SAMPLES& sample)
 {
-
-	VFloat_b(Electron_pt); 
-        VFloat_b(Muon_pt); 	
-        VFloat_b(Electron_phi);	
-       	VFloat_b(Muon_phi);	
-        VFloat_b(Electron_eta);	
+	//I declare the variables that I need from the ntuple
+	VFloat_b(Electron_pt);
+        VFloat_b(Muon_pt);
+        VFloat_b(Electron_phi);
+       	VFloat_b(Muon_phi);
+        VFloat_b(Electron_eta);
         VFloat_b(Muon_eta);
-	Float_b(MET_pt); 
+	Float_b(MET_pt);
         Float_b(MET_phi);
-        VFloat_b(Jet_pt);  
-	VFloat_b(Jet_eta); 
+        VFloat_b(Jet_pt);
+	VFloat_b(Jet_eta);
 	VFloat_b(Jet_phi);
 	VFloat_b(Jet_mass);
-	
 
-	TLorentzVector LorentzElec;		
-	TLorentzVector LorentzMuon;	
+	//I declare some vectors that I need to know the values to set the selection
+	TLorentzVector LorentzElec;
+	TLorentzVector LorentzMuon;
 	TLorentzVector LorentzMET;
 
-
+	//I set the variables for the above vectors
 	LorentzElec.SetPtEtaPhiM(Electron_pt[Indexelsel],Electron_eta[Indexelsel],Electron_phi[Indexelsel], electronMass);
 	LorentzMuon.SetPtEtaPhiM(Muon_pt[Indexmusel], Muon_eta[Indexmusel], Muon_phi[Indexmusel], muonMass);
 	LorentzMET.SetPtEtaPhiM(MET_pt, 0.0, MET_phi, METMass);	
 
-
+	//I assign the limit for the cuts regarding the transverse mass and the angle between the electron and muon and between the electron and met
 	double mt  = FOURVECTORS::TranverseMass(LorentzMuon, LorentzMET);
 	double angleemu = ANGLES::DeltaPhi(Muon_phi[Indexmusel], Electron_phi[Indexelsel]);
 	double angleemet = ANGLES::DeltaPhi(MET_phi, Electron_phi[Indexelsel]);
 
+	//the full selection highly depends on the number of jets we are asking for.
+	//I've have followed this table http://cms-results.web.cern.ch/cms-results/public-results/publications/HIG-17-001/ table 1
+	//[#2jetsStarts]
 	if(string(argv[3])=="2jets")
 	{
+		//I declare the vectors I need, one for each jet
 		TLorentzVector LorentzJet1;
 		TLorentzVector LorentzJet2;
-
+		//I fill the vector with the current information from the event
 		LorentzJet1.SetPtEtaPhiM(Jet_pt[Indexjetsel.at(0)], Jet_eta[Indexjetsel.at(0)], Jet_phi[Indexjetsel.at(0)], Jet_mass[Indexjetsel.at(0)]);
 		LorentzJet2.SetPtEtaPhiM(Jet_pt[Indexjetsel.at(1)], Jet_eta[Indexjetsel.at(1)], Jet_phi[Indexjetsel.at(1)], Jet_mass[Indexjetsel.at(1)]);
-
+		//I calculate the invariant mass of the jet becuase we set a cut on that variable
 		double mjj = FOURVECTORS::InvariantMass(LorentzJet1, LorentzJet2);
+		//I fill a plot to see how this distribution looks like before applying the cuts
 		FillPlot1D("mjj_beforecuts", sample , mjj , eventweight);
-		//std::cout << mjj << std::endl;
-		//here we are boosting ggH signal
+
+		//First we use the ggh signal selection
 		if (mjj<550. && mt>15. && angleemet<0.5)
 		{
-		FillPlot1D("hCollinearMass_2jetsGGH",sample,FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec, LorentzMET,ANGLES::DeltaPhi(Electron_phi[Indexelsel], MET_phi)),  eventweight);
-		FillPlot1D("mjj_GGHcuts",sample,mjj, eventweight);
+			double Collmass = FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec, LorentzMET,ANGLES::DeltaPhi(Electron_phi[Indexelsel], MET_phi));
+			FillPlot1D("hCollinearMass_2jetsGGH",sample,Collmass,  eventweight);
+			FillPlot1D("mjj_GGHcuts",sample,mjj, eventweight);
 		}
 		//here we are boosting VBF signal
 		if (mjj>=550. && mt>15. && angleemet<0.3)   
 		{
-		FillPlot1D("hCollinearMass_2jetsVBF",sample,FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec, LorentzMET,ANGLES::DeltaPhi(Electron_phi[Indexelsel], MET_phi)),  eventweight);
-		FillPlot1D("mjj_VBFcuts", sample, mjj, eventweight);
+			double Collmass = FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec, LorentzMET,ANGLES::DeltaPhi(Electron_phi[Indexelsel], MET_phi));
+			FillPlot1D("hCollinearMass_2jetsVBF",sample, Collmass,  eventweight);
+			FillPlot1D("mjj_VBFcuts", sample, mjj, eventweight);
 		}
 	}
-
+	//[#2jetsEnds]
+	//[#0jetsSelectionStarts]
 	else if(string(argv[3])=="0jets")
 	{
 		double newptmuCut = 30.;
@@ -1114,22 +1082,26 @@ bool TopAnalysis::FullSelection(char *argv[], double eventweight, SAMPLES& sampl
 		if(mt < 60.) return false;
 		if(angleemet > 0.7) return false;
 		if(angleemu < 2.5) return false;
-
-		FillPlot1D("hCollinearMass_0jets",sample,FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec, LorentzMET,ANGLES::DeltaPhi(Electron_phi[Indexelsel], MET_phi)), eventweight);
+		double Collmass = FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec, LorentzMET,ANGLES::DeltaPhi(Electron_phi[Indexelsel], MET_phi));
+		FillPlot1D("hCollinearMass_0jets",sample, Collmass, eventweight);
 
 	}
+	//[#0jetsSelectionEnds]
 
+	//[#1jetSelectionStarts]
 	else if(string(argv[3])=="1jet")
 	{
 		if(mt < 40.) return false;
 		if(angleemet > 0.7) return false;
 		if(angleemu < 1.0) return false;
-
-		FillPlot1D("hCollinearMass_1jet",sample,FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec, LorentzMET,ANGLES::DeltaPhi(Electron_phi[Indexelsel], MET_phi)), eventweight);
+		double Collmass = FOURVECTORS::CollinearMass(LorentzMuon, LorentzElec, LorentzMET,ANGLES::DeltaPhi(Electron_phi[Indexelsel], MET_phi));
+		FillPlot1D("hCollinearMass_1jet",sample, Collmass, eventweight);
 	}
-
-
+	//[#1jetSelectionEnds]
 }
+//[#FULLselectionRoutineEnds]
+
+//[#SelectionRoutineStarts]
 bool TopAnalysis::Select(char* argv[]) 
 {
 	////----- I am going to select one muon and one electron and veto any third lepton in the event
@@ -1212,10 +1184,12 @@ bool TopAnalysis::Select(char* argv[])
 			continue;
 		}
 		//Finally we count the good candidates as our selected electron
-      		else nelsel++;
-		//We pick the position of the electron in the array to use it later
-		if (Indexelsel == -1) Indexelsel = ie;
-
+      		else
+		{
+			nelsel++;
+			//We pick the position of the electron in the array to use it later
+			if (Indexelsel == -1) Indexelsel = ie;
+		}
   	}
 
 	//We just select one electron
@@ -1251,9 +1225,12 @@ bool TopAnalysis::Select(char* argv[])
 			continue;
 		}
 		//Finally we count the good candidates as our selected electron
-		else nmusel++;
-		//We pick the position of the muon in the array to use it later
-		if (Indexmusel == -1) Indexmusel = im;
+		else
+		{
+			nmusel++;
+			//We pick the position of the muon in the array to use it later
+			if (Indexmusel == -1) Indexmusel = im;
+		}
 
   	}
 	//We want events with one good muon
@@ -1304,9 +1281,13 @@ bool TopAnalysis::Select(char* argv[])
 		double deltaR_MuoJet = ANGLES::DeltaR(Muon_phi[Indexmusel], Jet_phi[ij], Muon_eta[Indexmusel], Jet_eta[ij]);
 		double deltaR_EleJet = ANGLES::DeltaR(Electron_phi[Indexelsel], Jet_phi[ij], Electron_eta[Indexelsel], Jet_eta[ij]);
 
+/*		std::cout << "index/totaljets " << ij << " " << nJet << std::endl;
+		std::cout << "	deltaR muon-jet, electron-jet " << deltaR_MuoJet <<" " << deltaR_EleJet << std::endl;*/
 		//I asked for these numbers to be bigger than 0.5
 		if(deltaR_MuoJet<0.5 || deltaR_EleJet<0.5) continue;// this cut was 0.3 before
 		//If I arrive to this point I got a btag jet and I selected it and store it in an array
+               std::cout << "index/totaljets " << ij << " " << nJet << std::endl;
+                std::cout << "  deltaR muon-jet, electron-jet " << deltaR_MuoJet <<" " << deltaR_EleJet << std::endl;
 		nbtagsel++;
 		Indexbtagsel.push_back(ij);
 		//Finally I distinguish between btags and jets by just using the pt value
@@ -1337,6 +1318,11 @@ bool TopAnalysis::Select(char* argv[])
 		std::cout << " **************ERROR: NOT OPTION FOUND****************** SELECTION ROUTINE - jets " << string(argv[3]) << std::endl;
 	}
 
+        std::cout << "number of selected jets " << Indexjetsel.size() << std::endl;
+        std::cout << "          Muon pt, eta, phi " << Muon_pt[Indexmusel] << " " << Muon_eta[Indexmusel] << " " << Muon_phi[Indexmusel] << std::endl;
+        std::cout << "                  Electron pt, eta, phi " << Electron_pt[Indexelsel] << " " << Electron_eta[Indexelsel] << " " << Electron_phi[Indexmusel] << std::endl;
+        std::cout << "                          Jet" << Indexjetsel[0] <<" pt, eta, phi " << Jet_pt[0] << " " << Jet_eta[0] <<" " << Jet_phi[0] << std::endl;
+        std::cout << "                                  Jet" << Indexjetsel[1] <<" pt, eta, phi " << Jet_pt[1] << " " << Jet_eta[1] <<" " << Jet_phi[1] << std::endl;
 	//Regarding the btag jets selection I count if the are Medium type, so that I loop over the btag selected jets
 	for(auto &ij : Indexbtagsel)
 	{
@@ -1367,3 +1353,4 @@ bool TopAnalysis::Select(char* argv[])
 
 	return true;
 }
+//[#SelectionRoutineEnds]
