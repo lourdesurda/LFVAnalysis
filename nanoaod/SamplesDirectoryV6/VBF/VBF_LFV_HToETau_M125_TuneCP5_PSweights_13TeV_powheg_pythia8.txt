@@ -1,0 +1,18 @@
+#Sample ID
+VBFHETau
+#Sample Flag
+isMCSignal
+#Sample file (dir+file)
+/eos/user/l/lurda/CMS/SamplesSignalETauMay2020/VBF_LFV_HToETau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/skimmed-nano
+#Sample XSection//3.782
+3.779
+#Sample NFiles (number of VALID trees)
+19
+#Real number of files 19
+#Total number of events in the original sample (Taken from Oscar's python macro)--> nanoaod --> python/RootLUSampleCheck.py
+1966500.0
+#Total events weight
+7589483.05344
+#DAS Events 
+#Name of the sample from DAS 
+#dataset=/VBF_LFV_HToETau_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM 

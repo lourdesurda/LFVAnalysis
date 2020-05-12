@@ -1,0 +1,18 @@
+#Sample ID
+MuonEG_A
+#Sample Flag
+isData
+#Sample file (dir+file)
+/eos/user/l/lurda/CMS/SamplesMuonEGMay2020/MuonEG_Run2018A-Nano25Oct2019-v1_NANOAOD/skimmed-nano
+#Luminosity [pb-1]
+14027.047499
+#Sample NFiles (number of VALID trees)
+555
+#Real number of trees 
+#Total number of entries in the original sample (Taken from Oscar's python macro)--> nanoaod --> python/RootLUSampleCheck.py
+31249788.0
+#Total event weight 
+31249788.0
+#DAS Entries 
+#Name of the sample from DAS 
+#dataset=/MuonEG/Run2018A-Nano25Oct2019-v1/NANOAOD 
