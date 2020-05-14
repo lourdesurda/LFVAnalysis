@@ -273,17 +273,17 @@ void CMSAnalysis::AddSample(const char * samplefichtxtfile)
 void CMSAnalysis::AddPlot1D(const TString& name, const TString& title, int nbins, double xmin, double xmax) 
 {
       	//for (unsigned int i=0; i<_sampleId.size(); ++i) 
-	//for (unsigned int i=0; i<_SampleInfo.size(); ++i) 
 	for (auto &xsample : _SampleInfo)
 	{
         	bool existing = false;
+
             	for (unsigned int j=0; j<hists_1D.size(); ++j) 
 		{
+
                   	TString thisname = hists_1D[j]->GetName();
-                  	//if (thisname == _sampleId[i]+"_"+name) 
-			if (thisname == xsample.SampleId+"_"+name)
+			if( (thisname == xsample.SampleId+"_"+name) )
 			{
-                        	existing = true; 
+	                      	existing = true; 
                         	break;
                   	}
             	}
@@ -303,7 +303,7 @@ double CMSAnalysis::GettingSF_bTag(const TString& DeepCSV, const TString& WP , c
 	{
 		if(WP=="comb")
 		{
-			if(fabs(Flavour) == 4 || fabs(Flavour) == 5) //# b o c
+			if(abs(Flavour) == 4 || abs(Flavour) == 5) //# b o c
 			{
 				if(SysType == "central")
 					return 0.909339+(0.00354*(log(pt+19)*(log(pt+18)*(3-(0.471623*log(pt+18))))));
@@ -390,26 +390,27 @@ double CMSAnalysis::bTagEventWeight(int nBtaggedJets, float bjetpt_1, int bjetfl
 
 
 //void CMSAnalysis::FillPlot1D(const TString& name, int isample, double value, double weight) //PileUp
-void CMSAnalysis::FillPlot1D(const TString& name, const SAMPLES &sample, double value, const TString& prefixsamplename, double weight) //PileUp
+void CMSAnalysis::FillPlot1D(const TString& name, const SAMPLES &sample, double value, double weight) //PileUp
 {
 	//name is the name of the histogram I wanna draw
-
-		TString newname;
 		for (unsigned int j=0; j<hists_1D.size(); j++)
 		{
-			if((hists_1D[j]->GetName())[0]=='Z') newname = hists_1D[j]->GetName();
-			else newname = prefixsamplename+"_"+hists_1D[j]->GetName();
-			if (newname==prefixsamplename+"_"+sample.SampleId+"_"+name)
-			//if (hists_1D[j]->GetName()==samplename+"_"+name)
+			//if((hists_1D[j]->GetName())[6]==prefixsamplename[6]) newname = hists_1D[j]->GetName();
+			//else newname = prefixsamplename+hists_1D[j]->GetName();
+			//if (newname==prefixsamplename+sample.SampleId+"_"+name)
+//                                std::cout << "Hola1     " << hists_1D[j]->GetName() << std::endl;
+  //                              std::cout << "Hola2     "<< sample.SampleId+"_"+prefixsamplename+name << std::endl;
+
+			if (hists_1D[j]->GetName()==sample.SampleId+"_"+name)
 			{
-//				std::cout << "Hola1	" << hists_1D[j]->GetName() << std::endl;
-//				std::cout << "Hola2	"<< prefixsamplename << std::endl;
+//				std::cout << "Hola3	" << hists_1D[j]->GetName() << std::endl;
+//				std::cout << "Hola4	"<< prefixsamplename+sample.SampleId+"_"+name << std::endl;
 				hists_1D[j]->Fill(value,sample.SampleWeight*weight);
-				if(hists_1D[j]->GetName()==prefixsamplename+"_"+sample.SampleId+"_"+name) continue;
-				else hists_1D[j]->SetName(prefixsamplename+"_"+sample.SampleId+"_"+name);
+//				if(hists_1D[j]->GetName()==prefixsamplename+sample.SampleId+"_"+name) continue;
+//				else hists_1D[j]->SetName(prefixsamplename+sample.SampleId+"_"+name);
 //				std::cout<< hists_1D[j]->GetName() <<  std::endl;
 			}
-			newname = "";
+//			newname = "";
 		}
 	//std::cout << "**************************Sample Weight " << _sampleWeight[isample]  << std::endl;
 }
@@ -478,11 +479,16 @@ double CMSAnalysis::ScaleFactors(const TH2D* SFHistogram, float lepton_variable1
 	double bin_variable1 = SFHistogram->GetXaxis()->FindBin(lepton_variable1);
 	//std::cout << "		bin_pt " << bin_pt << " MUON PT " << lepton_pt << " FINDBIN PT " << MuonEfficiencyHistogram->GetXaxis()->FindBin(lepton_pt) <<std::endl;
 
-	double bin_variable2 =SFHistogram->GetYaxis()->FindBin(lepton_variable2);
+//	std::cout << "bin_variable1 " << bin_variable1 << std::endl;
+	double bin_variable2 = SFHistogram->GetYaxis()->FindBin(lepton_variable2);
 	//std::cout << "			bin_eta " << bin_eta << " MUON ETA " << fabs(lepton_eta) << " FINDBIN ETA " << MuonEfficiencyHistogram->GetYaxis()->FindBin(fabs(lepton_eta)) << std::endl;
+//        std::cout << "bin_variable2 " << bin_variable2 << std::endl;
 
 	double  scalefactor= SFHistogram->GetBinContent(bin_variable1, bin_variable2);
 	//std::cout << "				VALUE FOR MUON EFFICIENCY INSIDE THE ROUTINE " << muon_efficiency << std::endl <<std::endl;
+//	if(scalefactor==0.)
+//	std::cout << "bin_variable1 " << bin_variable1 << " bin_variable2 " << bin_variable2 << std::endl;
+
 	return scalefactor;
 }
 /*double CMSAnalysis::ZptReweighting(const TH2D* ZptHistogram, double genM, double genpT)
@@ -542,6 +548,26 @@ double CMSAnalysis::QCDEstimationFunction(RooWorkspace *w, int jets, double dR, 
 
 }
 
+double CMSAnalysis::TriggerMuonEGFunction(RooWorkspace *w, float Electron_pt, float Electron_eta, float Muon_pt, float Muon_eta)
+{
+	w->var("m_pt")->setVal(Muon_pt);
+	w->var("m_eta")->setVal(Muon_eta);
+	w->var("e_pt")->setVal(Electron_pt);
+	w->var("e_eta")->setVal(Electron_eta);
+
+	double factor1_data = w->function("m_trg_23_data")->getVal();
+	double factor2_data = w->function("e_trg_12_data")->getVal();
+	double eff_trig_data = factor1_data*factor2_data;
+
+	double factor1_mc = w->function("m_trg_23_mc")->getVal();
+	double factor2_mc = w->function("e_trg_12_mc")->getVal();
+	double eff_trig_mc  = factor1_mc*factor2_mc;
+
+	double tEff = 0.0;
+	if (eff_trig_mc==0) return tEff = 0.0;
+	else return eff_trig_data/eff_trig_mc;
+}
+
 void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option, const string& charge, const string& muon, const string& jets, const string& bjets) 
 {
 	std::cout << sample.SampleId << " OPTION " << option << std::endl;
@@ -557,8 +583,7 @@ void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, c
 	for (unsigned int j=0; j<hists_1D.size(); ++j)
 	{
 		//std::cout <<"Saving:" << hists_1D[j]->GetName() << std::endl;
-        	if( (hists_1D[j]->GetName()==sample.SampleId+"_"+name) || (hists_1D[j]->GetName()=="ZTauTau_"+sample.SampleId+"_"+name) ||
-		    (hists_1D[j]->GetName()=="ZMuMu_"+sample.SampleId+"_"+name) || (hists_1D[j]->GetName()=="ZElEl_"+sample.SampleId+"_"+name))
+        	if( (hists_1D[j]->GetName()==sample.SampleId+"_"+name) )
 		//if((hists_1D[j]->GetEntries())!=0)
 		{
 			std::cout <<"Saving:	" << hists_1D[j]->GetName()<< std::endl;

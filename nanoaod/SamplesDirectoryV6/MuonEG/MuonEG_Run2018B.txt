@@ -1,5 +1,5 @@
 #Sample ID
-MuonEG_B
+DataB_MuonEG
 #Sample Flag
 isData
 #Sample file (dir+file)
