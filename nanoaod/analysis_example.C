@@ -755,14 +755,16 @@ struct MET : public RecoilCorrector
 				//if(statusflags_string.at[statusflags_string.length()-6])
 				char bit8;
 				//std::cout << statusflags_string.length() << std::endl;
-				for(unsigned int i=statusflags_string.length(); i>=statusflags_string.length()-6; i--)
+				for(unsigned int i=statusflags_string.length()-1; i>=statusflags_string.length()-7; i--)
 				{
+					std::cout << "statusflags bit " << i << " " << statusflags_string[i] <<std::endl;
 					bit8 = statusflags_string[i];
 				}
-				if(bit8=='1') isFromHardProccess = true; else if(bit8=='0') isFromHardProccess = false;
+				if(bit8=='1') isFromHardProccess = true; 
+
 			}
-//			if(!isFromHardProccess) continue;
-			std::cout << particle << " " << GenPart_pdgId[particle] << " " << GenPart_statusFlags[particle] << std::endl;
+			if(!isFromHardProccess) continue;
+			std::cout << "PARTICULA, id, statusflags " << particle << " " << GenPart_pdgId[particle] << " " << GenPart_statusFlags[particle] << std::endl;
 /*			bool isZ = false;
 			bool isW = false;
 			bool isH = false;
@@ -772,6 +774,7 @@ struct MET : public RecoilCorrector
 			if(GenPart_genPartIdxMother[particle] == 25) isH = true;
 */
 //			std::cout << "		Particle " << particle << std::endl;
+//                        if(GenPart_genPartIdxMother[particle] == 24) isW = true;
 			bool isMuon = false;
 			bool isElectron = false;
 			bool isNeutrino = false;
@@ -791,7 +794,7 @@ struct MET : public RecoilCorrector
                         if(isNeutrino) mass = METMass;
 
 			if(!isMuon && !isElectron && !isNeutrino) continue;
-			std::cout << "HAY ALGOOOOO" << std::endl;
+//			std::cout << "HAY ALGOOOOO" << std::endl;
 			GenParticle.SetPtEtaPhiM(GenPart_pt[particle], GenPart_eta[particle], GenPart_phi[particle], mass);
 
 			std::cout << "GenParticle.Pt() " << GenParticle.Pt() << std::endl;
