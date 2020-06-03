@@ -731,9 +731,9 @@ struct MET : public RecoilCorrector
 		std::cout << "MET RECOIL CORRECTION FUNCTION STARTS" << std::endl;
 
 		int njets;
-		if (jets == '0') njets = 0;
-		if (jets == '1') njets = 1;
-		if (jets == '2') njets = 2;
+		if (jets == '0') njets = 0+1;
+		if (jets == '1') njets = 1+1;
+		if (jets == '2') njets = 2+1;
 
 		std::cout << "Number of jets " << njets << std::endl;
 		float pfmetcorr_ex=0.0;
@@ -749,32 +749,21 @@ struct MET : public RecoilCorrector
 			statusflags_string = statusflags.toBinary(GenPart_statusFlags[particle]);
 			//std::cout << "statusflags " << statusflags_string << std::endl;
 			bool isFromHardProccess = false;
-			if(statusflags_string.length()<9) isFromHardProccess = true;
-			if(statusflags_string.length()>9)
-			{
-				//if(statusflags_string.at[statusflags_string.length()-6])
-				char bit8;
-				//std::cout << statusflags_string.length() << std::endl;
-				for(unsigned int i=statusflags_string.length()-1; i>=statusflags_string.length()-7; i--)
-				{
-					std::cout << "statusflags bit " << i << " " << statusflags_string[i] <<std::endl;
-					bit8 = statusflags_string[i];
-				}
-				if(bit8=='1') isFromHardProccess = true; 
 
+			char bit8;
+
+			for(unsigned int i=statusflags_string.length()-1; i>=statusflags_string.length()-9; i--)
+			{
+				//std::cout << "statusflags bit " << i << " " << statusflags_string[i] <<std::endl;
+				bit8 = statusflags_string.at(i);
 			}
+
+			if(bit8=='1') isFromHardProccess = true; 
+
 			if(!isFromHardProccess) continue;
+
 			std::cout << "PARTICULA, id, statusflags " << particle << " " << GenPart_pdgId[particle] << " " << GenPart_statusFlags[particle] << std::endl;
-/*			bool isZ = false;
-			bool isW = false;
-			bool isH = false;
-			
-			if(GenPart_genPartIdxMother[particle] == 23) isZ = true;
-			if(GenPart_genPartIdxMother[particle] == 24) isW = true;
-			if(GenPart_genPartIdxMother[particle] == 25) isH = true;
-*/
-//			std::cout << "		Particle " << particle << std::endl;
-//                        if(GenPart_genPartIdxMother[particle] == 24) isW = true;
+
 			bool isMuon = false;
 			bool isElectron = false;
 			bool isNeutrino = false;
@@ -794,10 +783,11 @@ struct MET : public RecoilCorrector
                         if(isNeutrino) mass = METMass;
 
 			if(!isMuon && !isElectron && !isNeutrino) continue;
-//			std::cout << "HAY ALGOOOOO" << std::endl;
-			GenParticle.SetPtEtaPhiM(GenPart_pt[particle], GenPart_eta[particle], GenPart_phi[particle], mass);
 
+			GenParticle.SetPtEtaPhiM(GenPart_pt[particle], GenPart_eta[particle], GenPart_phi[particle], mass);
+			std::cout << "particle ID, pt, eta, phi " << pdgId << " " << GenPart_pt[particle] << " " << GenPart_eta[particle] << " " << GenPart_phi[particle] << std::endl;
 			std::cout << "GenParticle.Pt() " << GenParticle.Pt() << std::endl;
+			std::cout << "GenParticle.Px() " << GenParticle.Px() << std::endl;
 			if(isMuon || isElectron || isNeutrino)
 			{
 				InvisibleVect += GenParticle;
@@ -1208,6 +1198,10 @@ bool TopAnalysis::FullSelection(char *argv[], double eventweight, SAMPLES& sampl
        	VFloat_b(Muon_phi);
         VFloat_b(Electron_eta);
         VFloat_b(Muon_eta);
+	VUChar_b(Muon_genPartFlav);
+	VInt_b(Muon_genPartIdx);
+	VUChar_b(Electron_genPartFlav);
+	VInt_b(Electron_genPartIdx);
 	Float_b(MET_pt);
         Float_b(MET_phi);
 	VFloat_b(Jet_pt);
@@ -1225,9 +1219,14 @@ bool TopAnalysis::FullSelection(char *argv[], double eventweight, SAMPLES& sampl
 	RecoilCorrector met("null");
 
 	float Corr_MET_pt = MET::METRecoil(met, char(argv[3][0]));
-	std::cout << "*******ORGINAL MET PT VALUE " << MET_pt << std::endl;
+	std::cout << "*******Fullselection Routine: ORIGINAL MET PT VALUE " << MET_pt << std::endl;
 	MET_pt = Corr_MET_pt;
-	std::cout << "******Corrected MET PT VALUE " << Corr_MET_pt << std::endl;
+	std::cout << "*******Fullselection Routine: Corrected MET PT VALUE " << Corr_MET_pt << std::endl;
+	std::cout << "	Selected Muon pt, eta, phi " << Muon_pt[Indexmusel] << " " << Muon_eta[Indexmusel] << " " << Muon_phi[Indexmusel] << std::endl;
+	std::cout << "	Selected Electron pt, eta, phi " << Electron_pt[Indexelsel] << " " << Electron_eta[Indexelsel] << " " << Electron_phi[Indexelsel] << std::endl;
+	std::cout << "	Muon_genPartFlav and Muon_genPartIdx " << Muon_genPartFlav[Indexmusel] << " IDX " << Muon_genPartIdx[Indexmusel] << std::endl;
+	std::cout << "	Electron_genPartFlav and  Electron_genPartIdx " << Electron_genPartFlav[Indexelsel] << " IDX " << Electron_genPartIdx[Indexelsel] << std::endl;
+	std::cout << "	MET pt, phi "	<< MET_pt <<" " << MET_phi << std::endl;
 	//I set the variables for the above vectors
 	LorentzElec.SetPtEtaPhiM(Electron_pt[Indexelsel],Electron_eta[Indexelsel],Electron_phi[Indexelsel], electronMass);
 	LorentzMuon.SetPtEtaPhiM(Muon_pt[Indexmusel], Muon_eta[Indexmusel], Muon_phi[Indexmusel], muonMass);
