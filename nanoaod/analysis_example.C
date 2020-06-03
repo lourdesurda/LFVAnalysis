@@ -135,7 +135,7 @@ struct ASCII
 {
 		std::map<std::string, double> Samples;
 		std::vector<std::string> HistogramsList;
-
+		
 		void txtCounter(const TString& name)
 		{
 			std::ifstream txtfile(name);
@@ -160,16 +160,23 @@ struct ASCII
 			{
 				txtfile >> input_sample >> input_xsec;
 				if(txtfile.eof()) break;
-				Samples.insert({input_sample, input_xsec});			
+				Samples.insert({input_sample, input_xsec});
 			}
 			txtfile.close();
 		}
-		
+
+		std::string toBinary(int n)
+		{
+			std::string r;
+			while(n!=0) {r=(n%2==0 ?"0":"1")+r; n/=2;}
+			return r;
+		}
+
 };
 
 struct FOURVECTORS
 {
-	
+
 	static double InvariantMass(const TLorentzVector &Particle1, const TLorentzVector &Particle2)
 	{
 		double _Invariant_Mass = (Particle1+Particle2).M(); return _Invariant_Mass;
@@ -721,27 +728,50 @@ struct MET : public RecoilCorrector
 		TLorentzVector InvisibleVect ;
 		TLorentzVector VisibleVect;
 
+		std::cout << "MET RECOIL CORRECTION FUNCTION STARTS" << std::endl;
+
 		int njets;
 		if (jets == '0') njets = 0;
 		if (jets == '1') njets = 1;
 		if (jets == '2') njets = 2;
 
+		std::cout << "Number of jets " << njets << std::endl;
 		float pfmetcorr_ex=0.0;
 		float pfmetcorr_ey=0.0;
 
                 for(int particle = 0; particle<nGenPart; particle++)
 		{
+//			std::cout << "GenPart_status[particle] " << GenPart_status[particle] << std::endl;
 			if(GenPart_status[particle] != 1) continue;//stable particle
-			if(GenPart_statusFlags[particle] != 8) continue;
-
+			//if(GenPart_statusFlags[particle] != 8) continue;
+			ASCII statusflags;
+			string statusflags_string;
+			statusflags_string = statusflags.toBinary(GenPart_statusFlags[particle]);
+			//std::cout << "statusflags " << statusflags_string << std::endl;
+			bool isFromHardProccess = false;
+			if(statusflags_string.length()<9) isFromHardProccess = true;
+			if(statusflags_string.length()>9)
+			{
+				//if(statusflags_string.at[statusflags_string.length()-6])
+				char bit8;
+				//std::cout << statusflags_string.length() << std::endl;
+				for(unsigned int i=statusflags_string.length(); i>=statusflags_string.length()-6; i--)
+				{
+					bit8 = statusflags_string[i];
+				}
+				if(bit8=='1') isFromHardProccess = true; else if(bit8=='0') isFromHardProccess = false;
+			}
+//			if(!isFromHardProccess) continue;
+			std::cout << particle << " " << GenPart_pdgId[particle] << " " << GenPart_statusFlags[particle] << std::endl;
 /*			bool isZ = false;
 			bool isW = false;
 			bool isH = false;
-
+			
 			if(GenPart_genPartIdxMother[particle] == 23) isZ = true;
 			if(GenPart_genPartIdxMother[particle] == 24) isW = true;
 			if(GenPart_genPartIdxMother[particle] == 25) isH = true;
 */
+//			std::cout << "		Particle " << particle << std::endl;
 			bool isMuon = false;
 			bool isElectron = false;
 			bool isNeutrino = false;
@@ -753,7 +783,6 @@ struct MET : public RecoilCorrector
 			if(pdgId == 14) isNeutrino = true;
 			if(pdgId == 16) isNeutrino = true;
 
-//			if(!isZ || !isW || !isH) continue;
 			TLorentzVector GenParticle;
 
 			double mass = 0.0;
@@ -761,10 +790,11 @@ struct MET : public RecoilCorrector
                         if(isElectron) mass = electronMass;
                         if(isNeutrino) mass = METMass;
 
-			if(!isMuon || !isElectron || !isNeutrino) continue;
+			if(!isMuon && !isElectron && !isNeutrino) continue;
+			std::cout << "HAY ALGOOOOO" << std::endl;
+			GenParticle.SetPtEtaPhiM(GenPart_pt[particle], GenPart_eta[particle], GenPart_phi[particle], mass);
 
-			else GenParticle.SetPtEtaPhiM(GenPart_pt[particle], GenPart_eta[particle], GenPart_phi[particle], mass);
-
+			std::cout << "GenParticle.Pt() " << GenParticle.Pt() << std::endl;
 			if(isMuon || isElectron || isNeutrino)
 			{
 				InvisibleVect += GenParticle;
@@ -776,11 +806,21 @@ struct MET : public RecoilCorrector
 
 		}
 
+		std::cout <<"AFTER GEN PARTICLES LOOP " << std::endl;
+		std::cout <<"(float)InvisibleVect.Px() " << (float)InvisibleVect.Px() << std::endl;
+		std::cout <<"(float)InvisibleVect.Py() " << (float)InvisibleVect.Py() << std::endl;
+		std::cout <<"(float)VisibleVect.Px() " << (float)VisibleVect.Px() << std::endl;
+		std::cout <<"(float)VisibleVect.Py() " << (float)VisibleVect.Py() << std::endl;
+
+
+		std::cout << "CORRECT WITH HIST " << std::endl;
 		cout << "Before " << pfmetcorr_ex << " " << pfmetcorr_ey << std::endl;
+
 		met.CorrectWithHist(pfmet_ex,pfmet_ey, (float)InvisibleVect.Px(), (float)InvisibleVect.Py(), (float)VisibleVect.Px(), (float)VisibleVect.Py(), njets, pfmetcorr_ex, pfmetcorr_ey);
+
                 cout << "After " << pfmetcorr_ex << " " << pfmetcorr_ey << std::endl;
 
-		float pfmetcorr = pfmetcorr_ey/pfmetcorr_ex;
+		float pfmetcorr = sqrt(pfmetcorr_ey*pfmetcorr_ey+pfmetcorr_ex*pfmetcorr_ex);
 
 		return pfmetcorr;
 	}
@@ -1182,9 +1222,9 @@ bool TopAnalysis::FullSelection(char *argv[], double eventweight, SAMPLES& sampl
 	RecoilCorrector met("null");
 
 	float Corr_MET_pt = MET::METRecoil(met, char(argv[3][0]));
-
+	std::cout << "*******ORGINAL MET PT VALUE " << MET_pt << std::endl;
 	MET_pt = Corr_MET_pt;
-
+	std::cout << "******Corrected MET PT VALUE " << Corr_MET_pt << std::endl;
 	//I set the variables for the above vectors
 	LorentzElec.SetPtEtaPhiM(Electron_pt[Indexelsel],Electron_eta[Indexelsel],Electron_phi[Indexelsel], electronMass);
 	LorentzMuon.SetPtEtaPhiM(Muon_pt[Indexmusel], Muon_eta[Indexmusel], Muon_phi[Indexmusel], muonMass);
