@@ -716,6 +716,7 @@ struct MET : public RecoilCorrector
 		VInt_b(GenPart_status);
 		VInt_b(GenPart_statusFlags);
 		VInt_b(GenPart_pdgId);
+		ULong64_t(event);
 
 		float pfmet_ex = 0.0;
 		float pfmet_ey = 0.0;
@@ -728,7 +729,7 @@ struct MET : public RecoilCorrector
 		TLorentzVector InvisibleVect ;
 		TLorentzVector VisibleVect;
 
-		std::cout << "MET RECOIL CORRECTION FUNCTION STARTS" << std::endl;
+		std::cout << "MET RECOIL CORRECTION FUNCTION STARTS FOR EVENT " << event << std::endl;
 
 		int njets;
 		if (jets == '0') njets = 0+1;
@@ -809,13 +810,15 @@ struct MET : public RecoilCorrector
 		std::cout << "CORRECT WITH HIST " << std::endl;
 		cout << "Before " << pfmetcorr_ex << " " << pfmetcorr_ey << std::endl;
 
-		met.CorrectWithHist(pfmet_ex,pfmet_ey, (float)InvisibleVect.Px(), (float)InvisibleVect.Py(), (float)VisibleVect.Px(), (float)VisibleVect.Py(), njets, pfmetcorr_ex, pfmetcorr_ey);
+		met.CorrectByMeanResolution(pfmet_ex,pfmet_ey, (float)InvisibleVect.Px(), (float)InvisibleVect.Py(), (float)VisibleVect.Px(), (float)VisibleVect.Py(), njets, pfmetcorr_ex, pfmetcorr_ey);
 
                 cout << "After " << pfmetcorr_ex << " " << pfmetcorr_ey << std::endl;
 
-		float pfmetcorr = sqrt(pfmetcorr_ey*pfmetcorr_ey+pfmetcorr_ex*pfmetcorr_ex);
+		TLorentzVector myMET;
+		myMET.SetPtEtaPhiM(sqrt(pfmetcorr_ey*pfmetcorr_ey+pfmetcorr_ex*pfmetcorr_ex), 0, atan2(pfmetcorr_ey, pfmetcorr_ex), 0);
+//		float pfmetcorr = sqrt(pfmetcorr_ey*pfmetcorr_ey+pfmetcorr_ex*pfmetcorr_ex);
 
-		return pfmetcorr;
+		return myMET.Pt();
 	}
 };
 
