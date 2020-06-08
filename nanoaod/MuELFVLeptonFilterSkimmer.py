@@ -7,6 +7,10 @@
 #
 
 from CMSSWCiemat.PyCiemat4NanoAOD.GeneralTools.SkimmingProcess_cff import SkimmingProcess
+#from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 import *
+from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
+from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 import *
+
 
 def skimmingMacro(filenames,goodlumis,maxevents=None, isData=False):
     """Routine to run the skimmer to select events containing leptons
@@ -58,6 +62,12 @@ def skimmingMacro(filenames,goodlumis,maxevents=None, isData=False):
     skimmer.filterPath.append(mufilter)
     skimmer.filterPath.append(dileptonfilter)
 
+    METCorrector = createJMECorrector(isMC=True, dataYear='2018', jesUncert="Total", jetType = "AK4PFchs", isFastSim=False)
+    modules = [METCorrector()]
+
+    p = PostProcessor('./', filenames, modules=modules, haddFileName="")
+    p.run()
+    skimmer.filterPath.append(METCorrector)
     # Setting up the skimming process
 
     skimmer.setup()
