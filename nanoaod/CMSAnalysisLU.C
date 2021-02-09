@@ -109,7 +109,7 @@ void CMSAnalysis::AddDataSampleFiles(const TString& id,  const TString& dir, con
         _sampleNFiles.push_back(nfiles);////PARECE QUE AQUI TAMPOCO SE USA PARA MUCHO ASI QUE SUPONGO QUE LA PODREMOS QUITAR
 	//
 	//SAMPLES ss(id, dir, file, nfiles, 1., _sampleNevents.back()/_lumi); //Defino un objeto de tipo samples
-	SAMPLES ss(id, dir,file, nfiles, 1., luminosity, "isData",  tree_tmp->GetEntriesFast()); //Defino un objeto de tipo samples
+	SAMPLES ss(id, dir,file, nfiles, 1., luminosity, "isData",  tree_tmp->GetEntriesFast(), tree_tmp->GetEntriesFast()); //Defino un objeto de tipo samples
 	_SampleInfo.push_back(ss);
 	//
 
@@ -197,7 +197,7 @@ void CMSAnalysis::AddMCSampleFiles(const TString& id, const TString& dir, const 
 	//(const TString& id,  const TString& dir, const TString& file, int nfiles, double xsec, double luminosity, const TString Flag, long long TotalNumberOfEvents)
 
 	//SAMPLES ss(id, dir, file, nfiles,_totalLuminosity/equivalent_lumi, xsec); //Defino un objeto de tipo samples
-	SAMPLES ss(id, dir,file, nfiles, xsec, -1. ,"isMCBckg", total_events_for_xsection); //Defino un objeto de tipo samples
+	SAMPLES ss(id, dir,file, nfiles, xsec, -1. ,"isMCBckg", total_events_for_xsection, tree_tmp->GetEntriesFast()); //Defino un objeto de tipo samples
 	//std::cout << "TEST 1 " << _sampleWeight[_sampleWeight.size()-1] <<std::endl;
 	_SampleInfo.push_back(ss);
 	//std::cout << "TEST 2 " << _sampleWeight[_sampleWeight.size()-1] <<std::endl;
@@ -471,6 +471,32 @@ RooWorkspace *CMSAnalysis::ReadingFileAndGettingRooWorkspace(TString path, TStri
 	return w;
 	f->Close();
 }
+/*TH1D* CMSAnalysis::RecoilCorrector_projH(TString _filename)
+{
+	 TFile * file = new TFile(_fileName);
+  if (file->IsZombie()) {
+    // std::cout << "file " << _fileName << " is not found...   quitting " << std::endl;
+    exit(-1);
+  }
+
+	TH1D* projH_histogram()
+	{
+  		TH1D * projH = (TH1D*)file->Get("projH");
+  		if (projH==NULL) {std::cout << "projH histogram could not be open" << std::endl;}
+
+  		TString firstBinStr  = projH->GetXaxis()->GetBinLabel(1);
+  		TString secondBinStr = projH->GetXaxis()->GetBinLabel(2);
+
+  		TString paralZStr = firstBinStr;
+  		TString perpZStr  = secondBinStr;
+  		if (firstBinStr.Contains("Perp")) {
+    			paralZStr = secondBinStr;
+    			perpZStr  = firstBinStr;
+  		}
+		return
+	}
+
+*/
 
 double CMSAnalysis::ScaleFactors(const TH2D* SFHistogram, float lepton_variable1, float lepton_variable2)
 {
@@ -566,6 +592,20 @@ double CMSAnalysis::TriggerMuonEGFunction(RooWorkspace *w, float Electron_pt, fl
 	double tEff = 0.0;
 	if (eff_trig_mc==0) return tEff = 0.0;
 	else return eff_trig_data/eff_trig_mc;
+}
+
+double CMSAnalysis::ElectronIDISOFunction(RooWorkspace *w, float Electron_pt, float Electron_eta, float Electron_miniPFRelIso_all)
+{
+        w->var("e_iso")->setVal(Electron_miniPFRelIso_all);
+        w->var("e_pt")->setVal(Electron_pt);
+        w->var("e_eta")->setVal(Electron_eta);
+
+	double eID = 1.0;
+	eID = w->function("e_id80_kit_ratio")->getVal();
+        double eISO = 1.0;
+	eISO = w->function("e_iso_kit_ratio")->getVal();
+	double eIDISOfactor = eID*eISO;
+	return eIDISOfactor;
 }
 
 void CMSAnalysis::SavingHistograms(const SAMPLES &sample, const TString& name, const TString& option, const string& charge, const string& muon, const string& jets, const string& bjets) 
